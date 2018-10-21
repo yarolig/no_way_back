@@ -1,9 +1,7 @@
-Your Game Title
-===============
+No Way Back
+===========
 
-Entry in PyWeek #4  <http://www.pyweek.org/4/>
-Team: YOUR TEAM NAME (leave the "Team: bit")
-Members: YOUR TEAM MEMBERS (leave the "Members: bit")
+Solo entry in PyWeek #26  <https://pyweek.org/26/> by Alexander Izmailov <yarolig@gmail.com>
 
 
 DEPENDENCIES:
@@ -11,9 +9,9 @@ DEPENDENCIES:
 You might need to install some of these before running the game:
 
   Python:     http://www.python.org/
-  PyGame:     http://www.pygame.org/
-  PyOpenGL:   http://pyopengl.sf.net/
 
+You can run this command to install the required libraries:
+  python -m pip install -r requirements.txt
 
 
 RUNNING THE GAME:
@@ -25,16 +23,13 @@ Othewise open a terminal / console and "cd" to the game directory and run:
   python run_game.py
 
 
-
 HOW TO PLAY THE GAME:
 
-Move the cursor around the screen with the mouse.
-
-Press the left mouse button to fire the ducks.
-
+There is no game yet.
 
 
 LICENSE:
-
-This game skellington is placed in the Public Domain.
+No Way Back will be free software.
+Code and artwork in data/ folder are distributed in terms of MIT License.
+Music in music/ folder will use Creative Commons licence. But there is no music yet.
 
