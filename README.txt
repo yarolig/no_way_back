@@ -8,7 +8,9 @@ DEPENDENCIES:
 
 You might need to install some of these before running the game:
 
-  Python:     http://www.python.org/
+  Python 2.7 or 3.6:     https://www.python.org/
+  PyGame:                https://www.pygame.org/
+  PyOpenGL:              http://pyopengl.sourceforge.net/
 
 You can run this command to install the required libraries:
   python -m pip install -r requirements.txt
@@ -29,7 +31,14 @@ There is no game yet.
 
 
 LICENSE:
-No Way Back will be free software.
-Code and artwork in data/ folder are distributed in terms of MIT License.
-Music in music/ folder will use Creative Commons licence. But there is no music yet.
+No Way Back is free software.
+Code in gamelib/ folder and artwork in data/ folder are distributed in terms of MIT License.
+Music in music/ uses a different licenses.
+
+Podington Bear -  Massive Attack
+================================
+File: music/Podington_Bear_-_11_-_Massive_Attack.ogg
+Modifications: Converted to OGG format.
+License: Attribution-NonCommercial 3.0 International License https://creativecommons.org/licenses/by-nc/3.0/
+Source: http://freemusicarchive.org/music/Podington_Bear/Homage_Fromage/Massive_Attack
 

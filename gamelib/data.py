@@ -9,11 +9,16 @@ import os
 
 data_py = os.path.abspath(os.path.dirname(__file__))
 data_dir = os.path.normpath(os.path.join(data_py, '..', 'data'))
+base_dir = os.path.normpath(os.path.join(data_py, '..'))
 
 def filepath(filename):
     '''Determine the path to a file in the data directory.
     '''
     return os.path.join(data_dir, filename)
+
+def musicpath(filename):
+    return os.path.join(base_dir, 'music', filename)
+
 
 def load(filename, mode='rb'):
     '''Open a file in the data directory.
