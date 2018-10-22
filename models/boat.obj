@@ -2,7 +2,7 @@
 # Exported from SketchUp, (c) 2000-2006 Google, Inc.
 # File units = meters
 
-mtllib boat.mtl
+mtllib models/boat.mtl
 
 g Mesh1 Model
 

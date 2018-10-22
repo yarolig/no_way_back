@@ -58,7 +58,7 @@ Files:
   models/boat/Material2.jpg
   models/boat/Material3.jpg
   models/boat/Wood_Cherry_Original.jpg
-Modifications: Removed files that not needed for the game. Reduced quality and size of Material2.jpg.
+Modifications: Removed files that not needed for the game. Reduced quality and size of Material1.jpg. Changed path to files in boat.obj and boat.mtl.
 Author: Jason Campbell
 License: CC0 1.0 Universal https://creativecommons.org/publicdomain/zero/1.0/
 Source: https://opengameart.org/content/fishing-boat-low-poly
