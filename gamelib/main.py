@@ -1,6 +1,8 @@
 from __future__ import print_function
 from . import data
 from .gui import *
+from .menu import *
+from .game import *
 
 import logging
 import pygame
@@ -9,38 +11,9 @@ import time
 from OpenGL import GL
 from OpenGL import GLU
 
-import pygame.examples
 import numpy as np
 import random
 import math
-
-class Boat(object):
-    def __init__(self):
-        self.pos = np.ndarray(shape=(2,), dtype=float)
-        self.dir = np.ndarray(shape=(2,), dtype=float)
-        self.vel = np.ndarray(shape=(2,), dtype=float)
-
-class Sink(object):
-    def __init__(self):
-        self.flow = 0
-
-class Field(object):
-    def __init__(self):
-        self.data = np.ndarray(shape=(100,100, 2), dtype=float)
-        for i in range(100):
-            for j in range(100):
-                self.data[i][j][0] = 0.5
-                self.data[i][j][1] = 0.5
-    def enum(self):
-        for i in range(32):
-            for j in range(32):
-                yield i,j,self.data[i][j]
-    def change(self):
-        for i in range(32):
-            for j in range(32):
-                self.data[i][j][0] += 0.001 * (random.randint(-100, 100) - random.randint(1, 10) * self.data[i][j][0])
-                self.data[i][j][1] += 0.001 *(random.randint(-100, 100) - random.randint(1,10)*self.data[i][j][1])
-
 
 class App(object):
     def __init__(self):
@@ -63,10 +36,12 @@ class App(object):
 
 
     def draw_game(self):
-        GL.glMatrixMode(GL.GL_MODELVIEW)
-        GL.glLoadIdentity()
-        w, h = self.get_screen_size()
-        GLU.gluOrtho2D(0, w, 0, h)
+        #GL.glMatrixMode(GL.GL_MODELVIEW)
+        #GL.glLoadIdentity()
+        #w, h = self.get_screen_size()
+        #GLU.gluOrtho2D(0, w, 0, h)
+
+        glEnable(GL_DEPTH_TEST)
         GL.glBegin(GL.GL_LINES)
         GL.glColor3f(1.0, 1.0, 1.0)
 
@@ -86,8 +61,6 @@ class App(object):
 
         logging.debug("mixer pre-init")
         pygame.mixer.pre_init()
-        # logging.debug("pygame.init")
-        # pygame.init()
 
         logging.debug("display.init")
         pygame.display.init()
@@ -96,7 +69,8 @@ class App(object):
         logging.debug("set_mode")
         self.surface = pygame.display.set_mode(
             [self.w, self.h],
-            pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE
+            pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE,
+
         )
 
         logging.debug("freetype")
@@ -107,63 +81,9 @@ class App(object):
         pygame.mixer.init(frequency=44100, buffer=1024*2)
         logging.debug("mixer init: {}".format(pygame.mixer.get_init()))
 
-        self.new_menu = None
-        self.save_menu = None
-        self.load_menu = None
-        self.main_menu = None
-        self.options_menu = None
-        self.sound_menu = None
-        self.credits_menu = None
-
-        def ss(d):
-            return lambda: self.start_game(d)
-
-        f = Frame()
-        f.ypos += 100
-        f.addButton("New Game", action=lambda: self.select_menu(self.new_menu))
-        f.addButton("Load Game", action=lambda: self.select_menu(self.save_menu))
-        f.addButton("Save Game", action=lambda: self.select_menu(self.load_menu))
-        f.addButton("Options", action=lambda: self.select_menu(self.options_menu))
-        f.addButton("Credits", action=lambda: self.select_menu(self.credits_menu))
-        f.addButton("Exit", action=self.exit)
-        self.main_menu = f
-
-        f = Frame()
-        f.ypos += 100
-        f.addButton("Easy", action=ss('easy'))
-        f.addButton("Normal", action=ss('normal'))
-        f.addButton("Hard", action=ss('hard'))
-        f.addButton("")
-        f.addButton("Impossible", action=ss('impossible'))
-        f.addButton("")
-        f.addButton("Back", action=lambda: self.select_menu(self.main_menu))
-        self.new_menu = f
-
-        f = Frame()
-        f.ypos += 100
-        # f.addButton("Graphics",action=lambda:self.select_menu(self.sound_menu))
-        f.addButton("Sound", action=lambda: self.select_menu(self.sound_menu))
-        # f.addButton("Controls",action=lambda:self.select_menu(self.sound_menu))
-        f.addButton("")
-        f.addButton("Back", action=lambda: self.select_menu(self.main_menu))
-        self.options_menu = f
-
-        f = Frame()
-        f.ypos += 100
-
-        f.addButton("Play music")
-        f.addButton("Music volume")
-        f.addButton("")
-        f.addButton("Sound volume")
-        f.addButton("")
-        f.addButton("Back", action=lambda: self.select_menu(self.options_menu))
-        self.sound_menu = f
-
-        #for i in range(3):
-        #    self.draw()
-        #    pygame.event.pump()
-
+        prepare_menu(self)
         self.select_menu(self.main_menu)
+        self.game = Game(self)
 
     def draw(self):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
@@ -180,6 +100,8 @@ class App(object):
         if self.active_menu:
             self.active_menu.draw()
         else:
+
+            self.game.draw()
             self.draw_game()
 
         pygame.display.flip()
@@ -213,7 +135,6 @@ class App(object):
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     def mainloop(self):
-
         self.start_music()
         while True:
             for e in pygame.event.get():
@@ -226,6 +147,7 @@ class App(object):
                 if e.type == pygame.KEYUP:
                     if e.key == pygame.K_q:
                         self.exit()
+                    self.game.onKey(e.key)
                 elif e.type == pygame.MOUSEMOTION:
                     if self.active_menu:
                         x, y = e.pos
