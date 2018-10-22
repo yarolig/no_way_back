@@ -11,6 +11,7 @@ You might need to install some of these before running the game:
   Python 2.7 or 3.6:     https://www.python.org/
   PyGame:                https://www.pygame.org/
   PyOpenGL:              http://pyopengl.sourceforge.net/
+  numpy
 
 You can run this command to install the required libraries:
   python -m pip install -r requirements.txt

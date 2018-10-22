@@ -3,6 +3,7 @@ from . import data
 from .gui import *
 from .menu import *
 from .game import *
+from .controls import *
 
 import logging
 import pygame
@@ -14,6 +15,7 @@ from OpenGL import GLU
 import numpy as np
 import random
 import math
+
 
 class App(object):
     def __init__(self):
@@ -34,23 +36,22 @@ class App(object):
         self.active_menu = None
         self.music.set_pos(59.55)
 
-
     def draw_game(self):
-        #GL.glMatrixMode(GL.GL_MODELVIEW)
-        #GL.glLoadIdentity()
-        #w, h = self.get_screen_size()
-        #GLU.gluOrtho2D(0, w, 0, h)
+        # GL.glMatrixMode(GL.GL_MODELVIEW)
+        # GL.glLoadIdentity()
+        # w, h = self.get_screen_size()
+        # GLU.gluOrtho2D(0, w, 0, h)
 
         glEnable(GL_DEPTH_TEST)
         GL.glBegin(GL.GL_LINES)
         GL.glColor3f(1.0, 1.0, 1.0)
 
-        for x,y,(fx, fy) in self.field.enum():
-            x*=30
-            y*=30
-            #print([x,y,(fx, fy)])
-            GL.glVertex3f(x,y, 0)
-            GL.glVertex3f(x+fx*30, y+fy*30, 0)
+        for x, y, (fx, fy) in self.field.enum():
+            x *= 30
+            y *= 30
+            # print([x,y,(fx, fy)])
+            GL.glVertex3f(x, y, 0)
+            GL.glVertex3f(x + fx * 30, y + fy * 30, 0)
         GL.glEnd()
 
     def init(self):
@@ -78,11 +79,13 @@ class App(object):
         self.font = pygame.freetype.Font(None)
 
         logging.debug("mixer init")
-        pygame.mixer.init(frequency=44100, buffer=1024*2)
+        pygame.mixer.init(frequency=44100, buffer=1024 * 2)
         logging.debug("mixer init: {}".format(pygame.mixer.get_init()))
 
         prepare_menu(self)
         self.select_menu(self.main_menu)
+        self.controls = Controls()
+        self.controls.load_config()
         self.game = Game(self)
 
     def draw(self):
@@ -147,7 +150,10 @@ class App(object):
                 if e.type == pygame.KEYUP:
                     if e.key == pygame.K_q:
                         self.exit()
-                    self.game.onKey(e.key)
+                    self.controls.onKey(e.key, False, self.game.actions)
+                    # self.game.onKey(e.key)
+                if e.type == pygame.KEYDOWN:
+                    self.controls.onKey(e.key, True, self.game.actions)
                 elif e.type == pygame.MOUSEMOTION:
                     if self.active_menu:
                         x, y = e.pos
