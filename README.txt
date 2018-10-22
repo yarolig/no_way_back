@@ -31,14 +31,34 @@ There is no game yet.
 
 
 LICENSE:
+
 No Way Back is free software.
 Code in gamelib/ folder and artwork in data/ folder are distributed in terms of MIT License.
-Music in music/ uses a different licenses.
+Music in music/ and models in models/ uses a different licenses.
+
+
+MUSIC:
 
 Podington Bear -  Massive Attack
 ================================
 File: music/Podington_Bear_-_11_-_Massive_Attack.ogg
 Modifications: Converted to OGG format.
+Author: Chad Crouch
 License: Attribution-NonCommercial 3.0 International License https://creativecommons.org/licenses/by-nc/3.0/
 Source: http://freemusicarchive.org/music/Podington_Bear/Homage_Fromage/Massive_Attack
 
+
+MODELS:
+
+Fishing Boat
+============
+Files:
+  models/boat.obj
+  models/boat.mtl
+  models/boat/Material2.jpg
+  models/boat/Material3.jpg
+  models/boat/Wood_Cherry_Original.jpg
+Modifications: Removed files that not needed for the game. Reduced quality and size of Material2.jpg.
+Author: Jason Campbell
+License: CC0 1.0 Universal https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://opengameart.org/content/fishing-boat-low-poly
