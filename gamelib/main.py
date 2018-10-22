@@ -43,6 +43,7 @@ class App(object):
         # GLU.gluOrtho2D(0, w, 0, h)
 
         glEnable(GL_DEPTH_TEST)
+        '''
         GL.glBegin(GL.GL_LINES)
         GL.glColor3f(1.0, 1.0, 1.0)
 
@@ -53,6 +54,7 @@ class App(object):
             GL.glVertex3f(x, y, 0)
             GL.glVertex3f(x + fx * 30, y + fy * 30, 0)
         GL.glEnd()
+        '''
 
     def init(self):
         self.active_menu = None

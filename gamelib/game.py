@@ -11,6 +11,7 @@ from OpenGL.GLU import *
 import objloader
 from .data import *
 from . import controls
+from . import worldgen
 
 
 def make_vector(x=0, y=0, z=0):
@@ -31,16 +32,9 @@ class Boat(object):
 
     def draw(self, game):
         glPushMatrix(GL_MODELVIEW_MATRIX)
-
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
-
-        angle = 0
         angle = math.atan2(self.dir[1], self.dir[0])
-        # angle = pygame.time.get_ticks()* 0.001
         glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)
-
-        logging.info("angle {}".format(angle))
-
         game.draw_model(self.model)
         glPopMatrix()
 
@@ -95,8 +89,49 @@ class Game(object):
         self.models = {}
         self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
         self.clock = pygame.time.Clock()
+        self.ticks=0
 
         self.actions = controls.make_actions()
+
+        self.world = worldgen.World()
+        self.world.generate()
+
+        self.wlist = glGenLists(1)
+        glNewList(self.wlist, GL_COMPILE)
+        sx, sy, sz = 10, 10, 10
+
+        def color_for_e(e):
+            if e <= 0:
+                glColor3f(.3, .4, 1)
+            elif e <= 10:
+                glColor3f(.6, .6, .1)
+            elif e <= 100:
+                glColor3f(.02, .5, .01)
+            else:
+                glColor3f(.8, .9, .9)
+        glBegin(GL_QUADS)
+        for i in range(300):
+            for j in range(300):
+                e1 = self.world.getz((i+0)*0.031, (j+0)*0.031)
+                e2 = self.world.getz((i+1)*0.031, (j+0)*0.031)
+                e3 = self.world.getz((i+1)*0.031, (j+1)*0.031)
+                e4 = self.world.getz((i+0)*0.031, (j+1)*0.031)
+                if 0:
+                    e1 = self.world.elevation[i][j]
+                    e2 = self.world.elevation[i + 1][j]
+                    e3 = self.world.elevation[i + 1][j + 1]
+                    e4 = self.world.elevation[i][j + 1]
+
+                color_for_e(e1)
+                glVertex3f((i) * sx, (j) * sy, e1 * sz - 5.0)
+                color_for_e(e2)
+                glVertex3f((i + 1) * sx, (j) * sy, e2 * sz - 5.0)
+                color_for_e(e3)
+                glVertex3f((i + 1) * sx, (j + 1) * sy, e3 * sz - 5.0)
+                color_for_e(e4)
+                glVertex3f((i) * sx, (j + 1) * sy, e4 * sz - 5.0)
+        glEnd()
+        glEndList()
 
     def draw_model(self, name):
         model = self.models.get(name, None)
@@ -109,7 +144,7 @@ class Game(object):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         w, h = map(float, list(self.app.get_screen_size()))
-        gluPerspective(90.0, w / h, 1.0, 1000.0)
+        gluPerspective(90.0, w / h, 1.0, 10000.0)
 
         self.player.dir = make_vector(math.cos(self.player.yaw),
                                       math.sin(self.player.yaw),
@@ -174,8 +209,13 @@ class Game(object):
         self.player.draw(self)
         for b in self.boats:
             b.draw(self)
+
+        glCallList(self.wlist)
         self.no_lights()
         self.physics()
+        self.ticks += 1
+        if self.ticks % 100 == 0:
+            pygame.display.set_caption("pyweek26: No Way Back FPS:{}".format(self.clock.get_fps()))
 
     def physics(self):
         if self.actions['a']:
@@ -183,7 +223,7 @@ class Game(object):
         if self.actions['d']:
             self.player.yaw -= 0.1
         if self.actions['w']:
-            self.player.vel += self.player.dir * 0.06
+            self.player.vel += self.player.dir * 0.6
         if self.actions['s']:
             self.player.vel -= self.player.dir * 0.06
 
@@ -201,6 +241,6 @@ class Game(object):
         elif key == pygame.K_d:
             self.player.yaw -= 0.1
         elif key == pygame.K_w:
-            self.player.pos += self.player.dir * 10
+            self.player.pos += self.player.dir * 100
         elif key == pygame.K_s:
-            self.player.pos -= self.player.dir * 10
+            self.player.pos -= self.player.dir * 100
