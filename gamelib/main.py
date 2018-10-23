@@ -25,6 +25,7 @@ class App(object):
 
         self.w = 800
         self.h = 600
+        self.game = None
 
     def get_screen_size(self):
         return (self.w, self.h)
@@ -32,9 +33,15 @@ class App(object):
     def select_menu(self, new_menu):
         self.active_menu = new_menu
 
-    def start_game(self, difficulty='normal'):
-        self.active_menu = None
+    def start_game(self, race):
+        self.select_menu(self.loading_menu)
+        pygame.event.pump()
+        self.draw()
+        pygame.event.pump()
+        self.game = Game(self, race)
         self.music.set_pos(59.55)
+        self.active_menu = None
+
 
     def draw_game(self):
         # GL.glMatrixMode(GL.GL_MODELVIEW)
@@ -88,7 +95,6 @@ class App(object):
         self.select_menu(self.main_menu)
         self.controls = Controls()
         self.controls.load_config()
-        self.game = Game(self)
 
     def draw(self):
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
@@ -104,8 +110,7 @@ class App(object):
         GLU.gluOrtho2D(0, w, 0, h)
         if self.active_menu:
             self.active_menu.draw()
-        else:
-
+        elif self.game:
             self.game.draw()
             self.draw_game()
 
@@ -152,10 +157,16 @@ class App(object):
                 if e.type == pygame.KEYUP:
                     if e.key == pygame.K_q:
                         self.exit()
-                    self.controls.onKey(e.key, False, self.game.actions)
+
+                    if self.game:
+                        if e.key == pygame.K_ESCAPE:
+                            self.select_menu(self.new_menu)
+                        else:
+                            self.controls.onKey(e.key, False, self.game.actions)
                     # self.game.onKey(e.key)
                 if e.type == pygame.KEYDOWN:
-                    self.controls.onKey(e.key, True, self.game.actions)
+                    if self.game:
+                        self.controls.onKey(e.key, True, self.game.actions)
                 elif e.type == pygame.MOUSEMOTION:
                     if self.active_menu:
                         x, y = e.pos
