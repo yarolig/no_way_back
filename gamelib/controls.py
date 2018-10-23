@@ -12,6 +12,7 @@ import pygame
 # It may be too challenging to support Python 2 and 3
 def make_actions():
     actions = {}
+    actions['W'] = False
     actions['w'] = False
     actions['s'] = False
     actions['a'] = False
@@ -34,6 +35,7 @@ class Controls(object):
         self.key_to_action[pygame.K_LEFT] = 'a'
         self.key_to_action[pygame.K_RIGHT] = 'd'
 
+        self.key_to_action[pygame.K_z] = 'W'
         self.key_to_action[pygame.K_w] = 'w'
         self.key_to_action[pygame.K_s] = 's'
         self.key_to_action[pygame.K_a] = 'a'

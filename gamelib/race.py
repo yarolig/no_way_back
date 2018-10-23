@@ -66,6 +66,55 @@ class VertexBuffer(object):
         glDeleteBuffers(1, self.id)
 
 
+A_SINK = 1
+A_SOURCE = 2
+A_CURL = 3
+A_FOUNTAIN = 4
+A_GEYSER = 5
+A_BUBBLE_SINK = 5
+A_GEYSER = 5
+
+
+
+class Anomaly(object):
+    def __init__(self, x, y, force = 1.0, range = 10):
+        self.x = x
+        self.y = y
+        self.force = force
+        self.range = range
+
+class SinkAnomaly(Anomaly):
+    value_multiplier = 1.0
+    def anomaly(self, x, y):
+        d = (self.x - x, self.y - y)
+        distance = (d[0] ** 2 + d[1] ** 2) ** 0.5
+        if distance < 0.001:
+            return (0.0, 0.0)
+        if distance > self.range:
+            return (0.0, 0.0)
+        direction = (d[0] / distance, d[1] / distance)
+        value = self.value_multiplier * self.force
+        return (direction[0]*value, direction[1]*value)
+
+
+class SourceAnomaly(SinkAnomaly):
+    value_multiplier = -1.0
+
+
+class CurlAnomaly(Anomaly):
+    value_multiplier = 1.0
+    def anomaly(self, x, y):
+        d = (self.x - x, self.y - y)
+        distance = (d[0] ** 2 + d[1] ** 2) ** 0.5
+        if distance < 0.001:
+            return (0.0, 0.0)
+        if distance > self.range:
+            return (0.0, 0.0)
+        direction = (d[0] / distance, d[1] / distance)
+        value = self.value_multiplier * self.force
+        return (-direction[1]*value, direction[0]*value)
+
+
 class Race(object):
     def __init__(self):
         self.vb = None
@@ -75,6 +124,7 @@ class Race(object):
         self.checkpoints = []
         self.bouys = []
         self.fzcache = None
+        self.anomalies = []
 
     def vbset(self, x, y, n, vz, vx=None, vy=None, normal=None, tex=None):
         assert 0 <= n < CELL_SUBDIVIDE ** 2
@@ -194,16 +244,25 @@ class Race(object):
     def sink(self, x, y):
         self.heightmap[x][y] = -50
         self.noisemap[x][y] = 0
+        a = SinkAnomaly(x,y)
+        a.range = 40
+        self.anomalies.append(a)
 
     @for_color(pygame.Color(255, 0, 255))
     def curl(self, x, y):
         self.heightmap[x][y] = -50
         self.noisemap[x][y] = 0
+        a = CurlAnomaly(x,y)
+        a.range = 40
+        self.anomalies.append(a)
 
     @for_color(pygame.Color(255, 128, 128))
     def fountain(self, x, y):
         self.heightmap[x][y] = -50
         self.noisemap[x][y] = 0
+        a = SourceAnomaly(x,y)
+        a.range = 30
+        self.anomalies.append(a)
 
     def noise_heightmap(self):
         w= self.w
@@ -246,6 +305,38 @@ class Race(object):
                     new_heightmap[x][y] = sum/len(dirs)
         self.heightmap = new_heightmap
 
+    def enum_currents(self, x, y):
+        if 0 <= x < self.w and 0 <= y < self.h:
+            sum = np.ndarray(shape=(2,), dtype=float)
+            if self.heightmap[x][y] >= 100.3:
+                pass
+            else:
+                for an in self.anomalies:
+                    yield an.anomaly(x,y)
+
+    def get_current(self, x, y):
+        sum = np.ndarray(shape=(2,), dtype=float)
+        for (x, y) in self.enum_currents(x,y):
+            sum += (x, y)
+        result = np.ndarray(shape=(3,), dtype=float)
+        result[0] = sum[0]
+        result[1] = sum[1]
+        result[2] = 0
+        return result
+
+    def calc_currents(self):
+        return
+        w = self.w
+        h = self.h
+        for y in range(h):
+            for x in range(w):
+                if self.heightmap[x][y] <= -0.3:
+                    self.currents[x][y][0] = 0
+                    self.currents[x][y][1] = 0
+                else:
+                    for an in self.anomalies:
+                        self.currents[x][y] += an.anomaly(x,y)
+
     def load(self, name):
         img = pygame.image.load(name)
         w, h = img.get_size()
@@ -254,6 +345,7 @@ class Race(object):
 
         self.heightmap = np.ndarray(shape=(w,h), dtype=float)
         self.noisemap = np.ndarray(shape=(w,h), dtype=float)
+        self.currents = np.ndarray(shape=(w,h,2), dtype=float)
 
         self.vb = VertexBuffer(size=w * h * CELL_SUBDIVIDE_SQUARED * VERTEX_SIZE)
         for y in range(h):
@@ -266,9 +358,11 @@ class Race(object):
                 else:
                     color_actions[c] = lambda s, x, y: None
                     logging.warn('Please add @for_color(pygame.Color{})'.format(c))
-
+        logging.info('calculating currents')
+        self.calc_currents()
+        logging.info('noising')
         self.noise_heightmap()
-        for i in range(5):
+        for i in range(2):
              logging.info('softening heightmap')
              self.soften_heightmap()
         #self.noise_heightmap()
