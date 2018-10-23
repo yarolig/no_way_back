@@ -2,6 +2,7 @@ import numpy as np
 import random
 import math
 import logging
+import glboilerplate
 
 import pygame
 import time
@@ -140,26 +141,35 @@ class Game(object):
 
         def color_for_e(e):
             if e <= -25:
-                glColor3f(.4, .4, .5)
+                return (.4, .4, .5)
             elif e <= -15:
-                glColor3f(.5, .5, .2)
+                return (.5, .5, .2)
             elif e <= 25:
-                glColor3f(.6, .6, .1)
+                return (.6, .6, .1)
             elif e <= 505:
-                glColor3f(.02, .5, .01)
+                return (.02, .5, .01)
             elif e <= 905:
-                glColor3f(.5, .5, .5)
+                return (.5, .5, .5)
             else:
-                glColor3f(.8, .9, .9)
+                return (.8, .9, .9)
 
-        self.wlist = glGenLists(1)
-        glNewList(self.wlist, GL_COMPILE)
         subx = 1
         suby = 1
         sx/=subx
         sy/=suby
 
-        glBegin(GL_QUADS)
+        floats = []
+        def col(e):
+            r,g,b=color_for_e(e)
+            floats.append(r)
+            floats.append(g)
+            floats.append(b)
+
+        def vert(x,y,z):
+            floats.append(x)
+            floats.append(y)
+            floats.append(z)
+
         for i in range(self.race.w*subx):
             logging.info('{}/{}'.format(i, self.race.w*subx))
 
@@ -169,48 +179,68 @@ class Game(object):
                 e3 = self.race.getfz((i + 1)/subx, (j + 1)/suby)
                 e4 = self.race.getfz((i + 0)/subx, (j + 1)/suby)
 
-                # print ('e1={}'.format(e1))
-                color_for_e(e1)
-                glVertex3f((i) * sx, (j) * sy, e1 * sz - 0.0)
-                color_for_e(e2)
-                glVertex3f((i + 1) * sx, (j) * sy, e2 * sz - 0.0)
-                color_for_e(e3)
-                glVertex3f((i + 1) * sx, (j + 1) * sy, e3 * sz - 0.0)
-                color_for_e(e4)
-                glVertex3f((i) * sx, (j + 1) * sy, e4 * sz - 0.0)
-        glEnd()
-        glEndList()
+                vert((i) * sx, (j) * sy, e1 * sz - 0.0)
+                col(e1)
+
+                vert((i + 1) * sx, (j) * sy, e2 * sz - 0.0)
+                col(e2)
+
+                vert((i + 1) * sx, (j + 1) * sy, e3 * sz - 0.0)
+                col(e3)
+
+                vert((i) * sx, (j + 1) * sy, e4 * sz - 0.0)
+                col(e4)
+        self.terrain = glboilerplate.VertexBuffer(
+            floats,
+            vertex_size=3,
+            color_size=3, color_offset=3*4,
+            mode=GL_QUADS)
+        self.terrain.prepare()
 
     def prepare_water(self):
-        self.waterlist = glGenLists(1)
-        glNewList(self.waterlist, GL_COMPILE)
         sx = 20.0*5
         sy = 20.0*5
         stx = 1.0
         sty = 1.0
-        glColor4f(0.2, 0.4, 0.7, 0.5)
-        glNormal3f(0.0,0.0,1.0)
-        glBegin(GL_QUADS)
+        floats = []
+        def tex(a,b):
+            floats.append(a)
+            floats.append(b)
+
+        def vert(x,y,z):
+            floats.append(x)
+            floats.append(y)
+            floats.append(z)
+
         for i in range(-30, self.race.w/5+30):
             for j in range(-30, self.race.h/5+30):
-                glTexCoord2f((i) * stx, (j) * sty)
-                glVertex3f((i) * sx, (j) * sy, 0.0)
 
-                glTexCoord2f((i + 1) * stx, (j) * sty)
-                glVertex3f((i + 1) * sx, (j) * sy, 0.0)
+                vert((i) * sx, (j) * sy, 0.0)
+                tex((i) * stx, (j) * sty)
 
-                glTexCoord2f((i + 1) * stx, (j) * sty)
-                glVertex3f((i + 1) * sx, (j + 1) * sy, 0.0)
-                glTexCoord2f((i) * stx, (j + 1) * sty)
-                glVertex3f((i) * sx, (j + 1) * sy, 0.0)
-        glEnd()
-        glEndList()
+                vert((i + 1) * sx, (j) * sy, 0.0)
+                tex((i + 1) * stx, (j) * sty)
+
+                vert((i + 1) * sx, (j + 1) * sy, 0.0)
+                tex((i + 1) * stx, (j) * sty)
+
+                vert((i) * sx, (j + 1) * sy, 0.0)
+                tex((i) * stx, (j + 1) * sty)
+        self.watervb = glboilerplate.VertexBuffer(
+            floats,
+            uv_offset=8, uv_size=2,
+            vertex_offset=0,
+            mode=GL_QUADS
+        )
+        self.watervb.prepare()
+
 
     def draw_model(self, name):
         model = self.models.get(name, None)
         if not model:
             logging.error("Model {} not loaded".format(name))
             return
+
         glCallList(self.models[name].gl_list)
 
     def setup_3d_camera(self):
@@ -248,6 +278,7 @@ class Game(object):
         glLightfv(GL_LIGHT0, GL_DIFFUSE, [0.8, 0.8, 0.5])
         glLightfv(GL_LIGHT0, GL_AMBIENT, [0.5, 0.5, 0.5])
 
+        '''
         # sky
         glEnable(GL_LIGHT1)
         glLightfv(GL_LIGHT1, GL_POSITION, [0, 0, 100])
@@ -259,7 +290,7 @@ class Game(object):
         glLightfv(GL_LIGHT2, GL_POSITION, [0, 0, -100])
         glLightfv(GL_LIGHT2, GL_DIFFUSE, [0.1, 0.1, 0.1])
         glLightfv(GL_LIGHT2, GL_AMBIENT, [0.0, 0.0, 0.0])
-
+        '''
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
 
         glEnable(GL_COLOR_MATERIAL)
@@ -270,11 +301,16 @@ class Game(object):
         glDisable(GL_LIGHTING)
 
     def draw_water(self):
-        #glEnable(GL_BLEND)
+        glEnable(GL_BLEND)
         #glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA)
         #glDisable(GL_COLOR_MATERIAL)
 
-        glCallList(self.waterlist)
+        #glCallList(self.waterlist)
+
+        glColor4f(0.2, 0.4, 0.7, 0.5)
+        glNormal3f(0.0,0.0,1.0)
+        self.watervb.draw()
+
         #glDisable(GL_BLEND)
         #glBlendFunc(GL_ONE, GL_ZERO)
         pass
@@ -283,47 +319,22 @@ class Game(object):
         self.clock.tick()
         self.setup_3d_camera()
 
-        if 1:
-            self.setup_lights()
-        else:
-
-            glLightfv(GL_LIGHT0, GL_POSITION, (-40, 200, 100, 0.0))
-            glLightfv(GL_LIGHT0, GL_AMBIENT, (0.2, 0.2, 0.2, 1.0))
-            glLightfv(GL_LIGHT0, GL_DIFFUSE, (0.5, 0.5, 0.5, 1.0))
-            glEnable(GL_LIGHT0)
-            glEnable(GL_LIGHTING)
-            glEnable(GL_COLOR_MATERIAL)
-            glEnable(GL_DEPTH_TEST)
-            glShadeModel(GL_SMOOTH)
-
+        self.setup_lights()
         self.player.draw(self)
+
         for b in self.boats:
             b.draw(self)
 
-        if True:
-            glEnable(GL_DEPTH_TEST)
+        #self.debug_currents()
 
-            glBegin(GL_LINES)
-            glColor3f(1.0, 0.0, 0.0)
-
-            for x, y, (fx, fy) in self.app.field.enum():
-                x *= 30
-                y *= 30
-                # print([x,y,(fx, fy)])
-                glVertex3f(x, y, 0)
-                glVertex3f(x + fx * 30, y + fy * 30, 0)
-            glEnd()
-
-        self.debug_currents()
-
-        glCallList(self.wlist)
+        self.terrain.draw()
         self.draw_water()
         self.no_lights()
         self.physics()
+
         self.ticks += 1
         if self.ticks % 100 == 0:
             pygame.display.set_caption("pyweek26: No Way Back FPS:{}".format(self.clock.get_fps()))
-
 
         self.setup_2d_camera()
 

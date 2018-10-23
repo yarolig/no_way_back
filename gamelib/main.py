@@ -42,27 +42,6 @@ class App(object):
         self.music.set_pos(59.55)
         self.active_menu = None
 
-
-    def draw_game(self):
-        # GL.glMatrixMode(GL.GL_MODELVIEW)
-        # GL.glLoadIdentity()
-        # w, h = self.get_screen_size()
-        # GLU.gluOrtho2D(0, w, 0, h)
-
-        glEnable(GL_DEPTH_TEST)
-        #
-        # GL.glBegin(GL.GL_LINES)
-        # GL.glColor3f(1.0, 1.0, 1.0)
-        #
-        # for x, y, (fx, fy) in self.field.enum():
-        #     x *= 30
-        #     y *= 30
-        #     # print([x,y,(fx, fy)])
-        #     GL.glVertex3f(x, y, 0)
-        #     GL.glVertex3f(x + fx * 30, y + fy * 30, 0)
-        # GL.glEnd()
-
-
     def init(self):
         self.active_menu = None
         self.music = None
@@ -112,7 +91,6 @@ class App(object):
             self.active_menu.draw()
         elif self.game:
             self.game.draw()
-            self.draw_game()
 
         pygame.display.flip()
         self.field.change()
