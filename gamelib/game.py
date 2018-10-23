@@ -2,7 +2,7 @@ import numpy as np
 import random
 import math
 import logging
-import glboilerplate
+from . import glboilerplate
 
 import pygame
 import time
@@ -212,8 +212,8 @@ class Game(object):
             floats.append(y)
             floats.append(z)
 
-        for i in range(-30, self.race.w/5+30):
-            for j in range(-30, self.race.h/5+30):
+        for i in range(-30, int(self.race.w/5)+30):
+            for j in range(-30, int(self.race.h/5)+30):
 
                 vert((i) * sx, (j) * sy, 0.0)
                 tex((i) * stx, (j) * sty)
@@ -241,12 +241,12 @@ class Game(object):
             logging.error("Model {} not loaded".format(name))
             return
 
-        glCallList(self.models[name].gl_list)
+        #glCallList(self.models[name].gl_list)
 
     def setup_3d_camera(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        w, h = map(float, list(self.app.get_screen_size()))
+        w, h = list(map(float, list(self.app.get_screen_size())))
         gluPerspective(90.0, w / h, 1.0, 10000.0)
 
         self.player.dir = make_vector(math.cos(self.player.yaw),
@@ -386,7 +386,7 @@ class Game(object):
             d.vel[1] = current[1]
             self.debris.append(d)
 
-        self.debris = filter(lambda x:x.ttl>0, self.debris)
+        self.debris = [x for x in self.debris if x.ttl>0]
 
         self.phy_boat(self.player)
         for b in self.boats:

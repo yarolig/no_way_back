@@ -92,7 +92,7 @@ class VertexBuffer(object):
 
         glVertexPointer(self.vertex_size, GL_FLOAT, self.stride,self.vertex_offset or None)
 
-        glDrawArrays(self.mode, 0,  len(self.data) * 4 / self.stride)
+        glDrawArrays(self.mode, 0,  len(self.data) * 4 // self.stride)
         glDisableClientState(GL_TEXTURE_COORD_ARRAY)
         glDisableClientState(GL_NORMAL_ARRAY)
         glDisableClientState(GL_COLOR_ARRAY)
