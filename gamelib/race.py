@@ -85,6 +85,15 @@ class Anomaly(object):
         self.force = force
         self.range = range
 
+    def pos_for_debris(self, scale):
+        a = random.randint(0, 999)
+        r = scale * self.range * 0.8 * (0.001 * random.randint(1, 1000)) # ** 0.5
+        x = r * math.cos(a)
+        y = r * math.sin(a)
+        z = 0
+        return (self.x*scale + x,
+                self.y*scale + y, z)
+
 class SinkAnomaly(Anomaly):
     value_multiplier = 1.0
     def anomaly(self, x, y):
@@ -96,7 +105,8 @@ class SinkAnomaly(Anomaly):
             return (0.0, 0.0)
         direction = (d[0] / distance, d[1] / distance)
         value = self.value_multiplier * self.force
-        return (direction[0]*value, direction[1]*value)
+        return (direction[0]*value - 0.01 * direction[1]*value,
+                direction[1]*value + 0.01 * direction[0]*value)
 
 
 class SourceAnomaly(SinkAnomaly):

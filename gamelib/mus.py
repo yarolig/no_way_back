@@ -1,6 +1,7 @@
 
 import random
 import pygame
+import pygame.event
 import logging
 import time
 from . import data
@@ -8,7 +9,6 @@ from . import data
 class Track(object):
     file = ''
     ls_time = 0.0
-
 
 
 class Mus(object):
@@ -22,10 +22,9 @@ class Mus(object):
 
 
         t = Track()
-        # t.file = 'Podington_Bear_-_11_-_Massive_Attack.ogg'
-        # t.ls_time = 59.55
-        # tracks.append(t)
-        # self.current_track = t
+        t.file = 'Podington_Bear_-_11_-_Massive_Attack.ogg'
+        t.ls_time = 59.55
+        self.tracks.append(t)
 
         t = Track()
         t.file = 'Cutside_-_01_-_Secret_Of_3rd_Planet.ogg'
@@ -39,9 +38,9 @@ class Mus(object):
         t.file = 'how_the_night_came_-_06_-_6_Pris.ogg'
         t.ls_time = 99.2
         self.tracks.append(t)
+        self.start_second_time = False
 
-
-        self.current_track = random.choice(self.tracks)
+        self.current_track = t # random.choice(self.tracks)
 
     def init(self):
         pass
@@ -51,7 +50,8 @@ class Mus(object):
         logging.debug("music file: {}".format(music_file))
         self.music = pygame.mixer.music
         self.music.load(music_file)
-        self.music.play(loops=-1)
+        self.music.play(loops=0)
+        self.music.set_endevent(pygame.USEREVENT)
 
         self.sounds['impact'] = pygame.mixer.Sound(data.musicpath('274943__theshaggyfreak__knock-knock1.ogg'))
         self.sounds['checkpoint'] = pygame.mixer.Sound(data.musicpath('332629__treasuresounds__item-pickup.ogg'))
@@ -59,9 +59,32 @@ class Mus(object):
 
 
     def onLevelStart(self, level):
+        if self.start_second_time:
+            self.change_music()
+        else:
+            self.start_second_time = True
+            if self.current_track.ls_time:
+                try:
+                    self.music.set_pos(self.current_track.ls_time)
+                except pygame.error:
+                    pass
 
-        if self.current_track.ls_time:
-            self.music.set_pos(self.current_track.ls_time)
+    def change_music(self):
+        if self.music is None:
+            return
+        for i in xrange(10):
+            t = random.choice(self.tracks)
+            if t is not self.current_track:
+                self.current_track = t
+                break
+        self.music.fadeout(300)
+        music_file = data.musicpath(self.current_track.file)
+        self.music.load(music_file)
+        self.music.play(loops=-1)
+
+    def onLevelEnd(self):
+        pass
+
 
     def onExit(self):
         if self.music:

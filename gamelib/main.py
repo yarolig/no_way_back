@@ -145,6 +145,8 @@ class App(object):
                         self.active_menu.click()
                 elif e.type == pygame.VIDEORESIZE:
                     self.onResize(e.w, e.h)
+                elif e.type == pygame.USEREVENT:
+                    self.mus.change_music()
                 else:
                     logging.debug("event {}".format(e))
 

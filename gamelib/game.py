@@ -46,6 +46,10 @@ class Boat(object):
     model = 'boat'
     stationary = False
     vel_fade = 0.98
+    hp = 100
+    destroy_on_impact = False
+    destroyed = False
+    quiet = False
 
     def __init__(self):
         self.pos = make_vector(0, 0, 0)
@@ -73,6 +77,57 @@ class Checkpoint(Boat):
     stationary = True
     visited = False
 
+class Debris(Boat):
+    model = 'bouy'
+    stationary = False
+    vel_fade = 0.1
+    ttl = 500
+    destroy_on_impact = True
+    quiet = True
+    path = None
+
+    def draw(self, game):
+        if self.path is None:
+            self.path = []
+        v = make_vector()
+        v += self.pos
+        self.path.append(v)
+        #else:
+        #    print('prev:{} curr:{}'.format(self.prevpos, self.pos))
+
+        #upos = self.pos + (0,0,10)
+        #glColor3f(1,1,1,1)
+        #glVertex3f(self.pos[0], self.pos[1], self.pos[2])
+        #glVertex3f(upos[0], upos[1], upos[2])
+
+        if self.ttl < 100:
+            glColor4f(0.01*self.ttl,
+                      0.01*self.ttl,
+                      0.01*self.ttl,
+                      0.01*self.ttl)
+        else:
+            glColor4f(1,1,1,0.5)
+
+        pl = len(self.path)
+        p0 = 0
+        p1 = int(0.1*pl)
+        p2 = int(0.3*pl)
+        p3 = int(0.5*pl)
+        p4 = int(0.9*pl)
+        glVertex3f(self.pos[0], self.pos[1], self.pos[2])
+        glVertex3f(self.path[p4][0], self.path[p4][1], self.path[p4][2])
+
+        glVertex3f(self.path[p4][0], self.path[p4][1], self.path[p4][2])
+        glVertex3f(self.path[p3][0], self.path[p3][1], self.path[p3][2])
+
+        glVertex3f(self.path[p3][0], self.path[p3][1], self.path[p3][2])
+        glVertex3f(self.path[p2][0], self.path[p2][1], self.path[p2][2])
+
+        glVertex3f(self.path[p2][0], self.path[p2][1], self.path[p2][2])
+        glVertex3f(self.path[p1][0], self.path[p1][1], self.path[p1][2])
+
+        glVertex3f(self.path[p1][0], self.path[p1][1], self.path[p1][2])
+        glVertex3f(self.path[p0][0], self.path[p0][1], self.path[p0][2])
 
 class Game(object):
     def __init__(self, app, racename='race1.png'):
@@ -83,6 +138,7 @@ class Game(object):
         self.player = p
         self.boats = []
         self.checkpoints = []
+        self.debris = []
         self.up = make_vector(0, 0, 1)
         self.models = {}
 
@@ -322,7 +378,7 @@ class Game(object):
 
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix(GL_MODELVIEW_MATRIX)
-        glTranslate(0,0,10)
+        glTranslate(0,0,0)
         glRotate(90, 1,0,0)
         pywavefront.visualization.draw(self.models[name])
         glPopMatrix()
@@ -428,13 +484,22 @@ class Game(object):
 
         self.skybox.draw()
         glPopMatrix()
-
-
         self.setup_lights()
+
+        glEnable(GL_BLEND)
+        glDisable(GL_TEXTURE_2D)
+        glColor4f(1.0,1.0,1.0,0.5)
+        glBegin(GL_LINES)
+        for b in self.debris:
+            b.draw(self)
+        glEnd()
+        glColor4f(1.0,1.0,1.0,1.0)
+
         self.player.draw(self)
 
         for b in self.boats:
             b.draw(self)
+
 
 
         self.tertex.bind()
@@ -445,6 +510,9 @@ class Game(object):
         self.no_lights()
         self.physics()
         self.logic()
+        self.add_debris()
+
+
 
         self.ticks += 1
         if self.ticks % 100 == 0:
@@ -455,6 +523,9 @@ class Game(object):
     def logic(self):
         win = True
         hit = False
+        if not self.checkpoints:
+            return
+
         for cp in self.checkpoints:
             if cp.visited:
                 continue
@@ -466,12 +537,51 @@ class Game(object):
 
         if win:
             self.app.mus.effect('win')
+            self.app.mus.onLevelEnd()
             for cp in self.checkpoints:
                 cp.visited = False
         elif hit:
             self.app.mus.effect('checkpoint')
 
+    def add_debris(self):
+        self.debris = [x for x in self.debris if x.ttl > 0]
+        for d in self.debris:
+            d.ttl -= 1
 
+        if self.ticks % 10 == 0:
+            for anomaly in self.race.anomalies:
+                for i in range(3):
+                    (x,y,z) = anomaly.pos_for_debris(self.race.sx)
+                    pos = make_vector(x, y, 0)
+                    if vector_len(pos-self.player.pos) > 1000.0:
+                        continue
+                    d = Debris()
+                    d.pos = pos
+                    d.pos[2] += -0.1*random.randint(1, 100)
+                    d.ttl = 200
+                    self.debris.append(d)
+        '''
+        dside = 2
+        ds = 200.0
+        djitter = 1.0;
+        if self.ticks % 75 == 0:
+            for i in range(-dside, dside):
+                for j in range(-dside, dside):
+                    if i == 0 and j == 0:
+                        continue
+                    # add debris
+                    d = Debris()
+                    d.pos = self.player.pos + (ds*i-0.1*random.randint(-1000, 1000),
+                                               ds*j-0.1*random.randint(-1000, 1000),
+                                               -0.1*random.randint(1, 100))
+                    d.ttl = 75
+                    # xx = int(d.pos[0]/self.race.sx)
+                    # yy = int(d.pos[1]/self.race.sy)
+                    # current = self.race.get_current(xx, yy)
+                    # d.vel[0] = current[0]
+                    # d.vel[1] = current[1]
+                    self.debris.append(d)
+        '''
 
     def debug_currents(self):
         boat = self.player
@@ -507,9 +617,11 @@ class Game(object):
         self.phy_boat(self.player)
         for b in self.boats:
             self.phy_boat(b)
+        for b in self.debris:
+            self.phy_boat(b)
 
     def phy_boat(self, boat):
-        if boat.stationary:
+        if boat.stationary or boat.destroyed:
             return
 
 
@@ -522,8 +634,10 @@ class Game(object):
                                     (newpos[1] + 0.5*self.race.sy)/self.race.sy)
             if newz > 0.0:
                 boat.vel = -0.9 / i  * boat.vel
-                self.app.mus.effect('impact')
-                break
+                if not boat.quiet:
+                    self.app.mus.effect('impact')
+                if boat.destroy_on_impact:
+                    boat.destroyed = True
         else:
             boat.pos += boat.vel
 
