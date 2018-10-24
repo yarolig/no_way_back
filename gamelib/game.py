@@ -198,11 +198,14 @@ class Game(object):
         self.terrain.prepare()
 
     def prepare_water(self):
-        sx = 20.0*5
-        sy = 20.0*5
+        water_scale = 5.0
+        water_overhang = 10
+        sx = self.race.sx*water_scale
+        sy = self.race.sx*water_scale
         stx = 1.0
         sty = 1.0
         floats = []
+
         def tex(a,b):
             floats.append(a)
             floats.append(b)
@@ -212,9 +215,8 @@ class Game(object):
             floats.append(y)
             floats.append(z)
 
-        for i in range(-30, int(self.race.w/5)+30):
-            for j in range(-30, int(self.race.h/5)+30):
-
+        for i in range(-water_overhang, int(self.race.w/water_scale)+water_overhang):
+            for j in range(-water_overhang, int(self.race.h/water_scale)+water_overhang):
                 vert((i) * sx, (j) * sy, 0.0)
                 tex((i) * stx, (j) * sty)
 
@@ -241,7 +243,7 @@ class Game(object):
             logging.error("Model {} not loaded".format(name))
             return
 
-        #glCallList(self.models[name].gl_list)
+        glCallList(self.models[name].gl_list)
 
     def setup_3d_camera(self):
         glMatrixMode(GL_PROJECTION)

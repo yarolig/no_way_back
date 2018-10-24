@@ -24,6 +24,9 @@ def musicpath(filename):
 def modelpath(filename):
     return os.path.join(base_dir, 'models', filename)
 
+def userpath(filename):
+    return os.path.join(base_dir, 'userdata', filename)
+
 def load(filename, mode='rb'):
     '''Open a file in the data directory.
 

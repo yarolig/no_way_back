@@ -4,6 +4,7 @@ from .gui import *
 from .menu import *
 from .game import *
 from .controls import *
+from .config import *
 
 import logging
 import pygame
@@ -46,6 +47,10 @@ class App(object):
         self.active_menu = None
         self.music = None
 
+        self.config = load_config()
+
+        self.w, self.h = list(map(int,
+                                  self.config['Resolution'].split('x')))
         logging.basicConfig(level=logging.DEBUG)
 
         logging.debug("mixer pre-init")
@@ -56,10 +61,10 @@ class App(object):
         pygame.display.set_caption("pyweek26: No Way Back")
 
         logging.debug("set_mode")
+
         self.surface = pygame.display.set_mode(
             [self.w, self.h],
             pygame.OPENGL | pygame.DOUBLEBUF | pygame.HWSURFACE | pygame.RESIZABLE,
-
         )
 
         logging.debug("freetype")
@@ -148,7 +153,7 @@ class App(object):
                 elif e.type == pygame.MOUSEMOTION:
                     if self.active_menu:
                         x, y = e.pos
-                        self.active_menu.mouseMove(x, 600 - y)
+                        self.active_menu.mouseMove(x, self.h - y)
                 elif e.type == pygame.MOUSEBUTTONUP:
                     if self.active_menu:
                         self.active_menu.click()
