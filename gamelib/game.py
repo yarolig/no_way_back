@@ -27,12 +27,12 @@ class Boat(object):
     model = 'boat'
     stationary = False
     vel_fade = 0.98
+
     def __init__(self):
         self.pos = make_vector(0, 0, 0)
         self.dir = make_vector(1, 1, 0)
         self.yaw = 0
         self.vel = make_vector(0, 0, 0)
-
 
     def draw(self, game):
         glPushMatrix(GL_MODELVIEW_MATRIX)
@@ -52,36 +52,6 @@ class Checkpoint(Boat):
     model = 'checkpoint'
     stationary = True
 
-class Debris(Boat):
-    model = 'checkpoint'
-    ttl = 1000
-    vel_fade = 0.1
-
-
-class Sink(object):
-    def __init__(self):
-        self.flow = 0
-
-
-class Field(object):
-    def __init__(self):
-        self.data = np.ndarray(shape=(100, 100, 2), dtype=float)
-        for i in range(100):
-            for j in range(100):
-                self.data[i][j][0] = 0.5
-                self.data[i][j][1] = 0.5
-
-    def enum(self):
-        for i in range(32):
-            for j in range(32):
-                yield i, j, self.data[i][j]
-
-    def change(self):
-        for i in range(32):
-            for j in range(32):
-                self.data[i][j][0] += 0.001 * (random.randint(-100, 100) - random.randint(1, 10) * self.data[i][j][0])
-                self.data[i][j][1] += 0.001 * (random.randint(-100, 100) - random.randint(1, 10) * self.data[i][j][1])
-
 
 class Game(object):
     def __init__(self, app, racename='race1.png'):
@@ -91,20 +61,6 @@ class Game(object):
         p.dir = make_vector(0, 1, 0)
         self.player = p
         self.boats = []
-        self.debris = []
-
-        b = Boat()
-        b.pos = make_vector(0, 100, 0)
-        b.yaw = 0
-        b.dir = make_vector(1, 0, 0)
-        self.boats.append(b)
-
-        b = Boat()
-        b.pos = make_vector(100, 100, 0)
-        b.yaw = 90
-        b.dir = make_vector(1, 1, 0)
-        self.boats.append(b)
-
         self.up = make_vector(0, 0, 1)
         self.models = {}
         self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
@@ -128,6 +84,7 @@ class Game(object):
         self.player.pos = make_vector(sx * self.race.startpos[0],
                                       sy * self.race.startpos[1])
         self.player.yaw = 270
+
         for x, y in self.race.bouys:
             b = Bouy()
             b.pos = make_vector(sx * x, sy * y, 0)
@@ -154,29 +111,30 @@ class Game(object):
 
         subx = 1
         suby = 1
-        sx/=subx
-        sy/=suby
+        sx /= subx
+        sy /= suby
 
         floats = []
+
         def col(e):
-            r,g,b=color_for_e(e)
+            r, g, b = color_for_e(e)
             floats.append(r)
             floats.append(g)
             floats.append(b)
 
-        def vert(x,y,z):
+        def vert(x, y, z):
             floats.append(x)
             floats.append(y)
             floats.append(z)
 
-        for i in range(self.race.w*subx):
-            logging.info('{}/{}'.format(i, self.race.w*subx))
+        for i in range(self.race.w * subx):
+            logging.info('{}/{}'.format(i, self.race.w * subx))
 
-            for j in range(self.race.h*suby):
-                e1 = self.race.getfz((i + 0)/subx, (j + 0)/suby)
-                e2 = self.race.getfz((i + 1)/subx, (j + 0)/suby)
-                e3 = self.race.getfz((i + 1)/subx, (j + 1)/suby)
-                e4 = self.race.getfz((i + 0)/subx, (j + 1)/suby)
+            for j in range(self.race.h * suby):
+                e1 = self.race.getfz((i + 0) / subx, (j + 0) / suby)
+                e2 = self.race.getfz((i + 1) / subx, (j + 0) / suby)
+                e3 = self.race.getfz((i + 1) / subx, (j + 1) / suby)
+                e4 = self.race.getfz((i + 0) / subx, (j + 1) / suby)
 
                 vert((i) * sx, (j) * sy, e1 * sz - 0.0)
                 col(e1)
@@ -192,30 +150,30 @@ class Game(object):
         self.terrain = glboilerplate.VertexBuffer(
             floats,
             vertex_size=3,
-            color_size=3, color_offset=3*4,
+            color_size=3, color_offset=3 * 4,
             mode=GL_QUADS)
         self.terrain.prepare()
 
     def prepare_water(self):
         water_scale = 5.0
         water_overhang = 10
-        sx = self.race.sx*water_scale
-        sy = self.race.sx*water_scale
+        sx = self.race.sx * water_scale
+        sy = self.race.sx * water_scale
         stx = 1.0
         sty = 1.0
         floats = []
 
-        def tex(a,b):
+        def tex(a, b):
             floats.append(a)
             floats.append(b)
 
-        def vert(x,y,z):
+        def vert(x, y, z):
             floats.append(x)
             floats.append(y)
             floats.append(z)
 
-        for i in range(-water_overhang, int(self.race.w/water_scale)+water_overhang):
-            for j in range(-water_overhang, int(self.race.h/water_scale)+water_overhang):
+        for i in range(-water_overhang, int(self.race.w / water_scale) + water_overhang):
+            for j in range(-water_overhang, int(self.race.h / water_scale) + water_overhang):
                 vert((i) * sx, (j) * sy, 0.0)
                 tex((i) * stx, (j) * sty)
 
@@ -234,7 +192,6 @@ class Game(object):
             mode=GL_QUADS
         )
         self.watervb.prepare()
-
 
     def draw_model(self, name):
         model = self.models.get(name, None)
@@ -262,6 +219,7 @@ class Game(object):
                   self.up[0], self.up[1], self.up[2])
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_BLEND)
+
     def setup_2d_camera(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -279,7 +237,6 @@ class Game(object):
         glLightfv(GL_LIGHT0, GL_DIFFUSE, [0.8, 0.8, 0.5])
         glLightfv(GL_LIGHT0, GL_AMBIENT, [0.5, 0.5, 0.5])
 
-        '''
         # sky
         glEnable(GL_LIGHT1)
         glLightfv(GL_LIGHT1, GL_POSITION, [0, 0, 100])
@@ -291,29 +248,19 @@ class Game(object):
         glLightfv(GL_LIGHT2, GL_POSITION, [0, 0, -100])
         glLightfv(GL_LIGHT2, GL_DIFFUSE, [0.1, 0.1, 0.1])
         glLightfv(GL_LIGHT2, GL_AMBIENT, [0.0, 0.0, 0.0])
-        '''
-        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
 
+        glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
         glEnable(GL_COLOR_MATERIAL)
         glShadeModel(GL_SMOOTH)
 
     def no_lights(self):
-
         glDisable(GL_LIGHTING)
 
     def draw_water(self):
         glEnable(GL_BLEND)
-        #glBlendFunc(GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA)
-        #glDisable(GL_COLOR_MATERIAL)
-
-        #glCallList(self.waterlist)
-
         glColor4f(0.2, 0.4, 0.7, 0.5)
-        glNormal3f(0.0,0.0,1.0)
+        glNormal3f(0.0, 0.0, 1.0)
         self.watervb.draw()
-
-        #glDisable(GL_BLEND)
-        #glBlendFunc(GL_ONE, GL_ZERO)
         pass
 
     def draw(self):
@@ -325,9 +272,6 @@ class Game(object):
 
         for b in self.boats:
             b.draw(self)
-
-        #self.debug_currents()
-
         self.terrain.draw()
         self.draw_water()
         self.no_lights()
@@ -341,26 +285,22 @@ class Game(object):
 
     def debug_currents(self):
         boat = self.player
-        xx = int(boat.pos[0]/self.race.sx)
-        yy = int(boat.pos[1]/self.race.sy)
+        xx = int(boat.pos[0] / self.race.sx)
+        yy = int(boat.pos[1] / self.race.sy)
 
         glBegin(GL_LINES)
-        glColor3f(0.0,1.0,0.0)
+        glColor3f(0.0, 1.0, 0.0)
         n = 0
 
         glVertex3f(boat.pos[0], boat.pos[1], 0)
         glVertex3f(boat.pos[0], boat.pos[1], 10.0)
 
-        for (x,y) in self.race.enum_currents(xx,yy):
-            glColor3f(0.0,1.0,1.0)
+        for (x, y) in self.race.enum_currents(xx, yy):
+            glColor3f(0.0, 1.0, 1.0)
             glVertex3f(boat.pos[0], boat.pos[1], 0)
-            glVertex3f(boat.pos[0]-x*1000.0, boat.pos[1]-y*1000.0, 10.0)
-            n+=1
-            #if n > 20:
-            #    break
+            glVertex3f(boat.pos[0] - x * 1000.0, boat.pos[1] - y * 1000.0, 10.0)
+            n += 1
         glEnd()
-
-
 
     def physics(self):
         if self.actions['a']:
@@ -374,42 +314,21 @@ class Game(object):
         if self.actions['s']:
             self.player.vel -= self.player.dir * 0.06
 
-        while len(self.debris) < 10:
-            # add debris
-            d = Debris()
-            d.pos = self.player.pos + (random.randint(20, 40)*random.randint(-1,1),
-                                       random.randint(20, 40)*random.randint(-1,1), 0)
-
-            xx = int(d.pos[0]/self.race.sx)
-            yy = int(d.pos[1]/self.race.sy)
-            current = self.race.get_current(xx, yy)
-            d.vel[0] = current[0]
-            d.vel[1] = current[1]
-            self.debris.append(d)
-
-        self.debris = [x for x in self.debris if x.ttl>0]
-
         self.phy_boat(self.player)
         for b in self.boats:
             self.phy_boat(b)
-
-        for d in self.debris:
-            self.phy_boat(d)
-
-
 
     def phy_boat(self, boat):
         if boat.stationary:
             return
         boat.pos += boat.vel
-        xx = int(boat.pos[0]/self.race.sx)
-        yy = int(boat.pos[1]/self.race.sy)
+        xx = int(boat.pos[0] / self.race.sx)
+        yy = int(boat.pos[1] / self.race.sy)
         current = self.race.get_current(xx, yy)
-        #logging.info('current current {}'.format(current))
+        # logging.info('current current {}'.format(current))
         boat.vel += current
         boat.vel *= boat.vel_fade
         boat.vel -= current
-
 
     def onKey(self, key):
         if key == pygame.K_a:

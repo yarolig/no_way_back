@@ -5,6 +5,7 @@ from .menu import *
 from .game import *
 from .controls import *
 from .config import *
+from .mus import *
 
 import logging
 import pygame
@@ -22,7 +23,6 @@ class App(object):
     def __init__(self):
         self.boat = None
         self.debris = []
-        self.field = Field()
 
         self.w = 800
         self.h = 600
@@ -40,12 +40,12 @@ class App(object):
         self.draw()
         pygame.event.pump()
         self.game = Game(self, race)
-        self.music.set_pos(59.55)
+        self.mus.onLevelStart(race)
         self.active_menu = None
 
     def init(self):
         self.active_menu = None
-        self.music = None
+        self.mus = Mus(self)
 
         self.config = load_config()
 
@@ -98,14 +98,6 @@ class App(object):
             self.game.draw()
 
         pygame.display.flip()
-        self.field.change()
-
-    def start_music(self):
-        music_file = data.musicpath("Podington_Bear_-_11_-_Massive_Attack.ogg")
-        logging.debug("music file: {}".format(music_file))
-        self.music = pygame.mixer.music
-        self.music.load(music_file)
-        self.music.play(loops=-1)
 
     def onResize(self, w, h):
         # TODO: delay resize
@@ -121,21 +113,16 @@ class App(object):
         logging.debug("info: {}".format(pygame.display.Info()))
 
     def exit(self):
-        if self.music:
-            self.music.fadeout(500)
-            time.sleep(0.5)
-            self.music = None
+        self.mus.onExit()
         pygame.event.post(pygame.event.Event(pygame.QUIT))
 
     def mainloop(self):
-        self.start_music()
+        self.mus.onStart()
         while True:
             for e in pygame.event.get():
 
                 if e.type == pygame.QUIT:
-                    if self.music:
-                        self.music.fadeout(500)
-                        time.sleep(0.5)
+                    self.mus.onExit()
                     return
                 if e.type == pygame.KEYUP:
                     if e.key == pygame.K_q:

@@ -1,10 +1,3 @@
-'''Simple data loader module.
-
-Loads data files from the "data" directory shipped with a game.
-
-Enhancing this to handle caching etc. is left as an exercise for the reader.
-'''
-
 import os
 
 data_py = os.path.abspath(os.path.dirname(__file__))
@@ -13,23 +6,16 @@ base_dir = os.path.normpath(os.path.join(data_py, '..'))
 
 
 def filepath(filename):
-    '''Determine the path to a file in the data directory.
-    '''
     return os.path.join(data_dir, filename)
 
 
 def musicpath(filename):
     return os.path.join(base_dir, 'music', filename)
 
+
 def modelpath(filename):
     return os.path.join(base_dir, 'models', filename)
 
+
 def userpath(filename):
     return os.path.join(base_dir, 'userdata', filename)
-
-def load(filename, mode='rb'):
-    '''Open a file in the data directory.
-
-    "mode" is passed as the second arg to open().
-    '''
-    return open(os.path.join(data_dir, filename), mode)

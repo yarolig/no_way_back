@@ -49,6 +49,43 @@ License: Attribution-NonCommercial 3.0 International License https://creativecom
 Source: http://freemusicarchive.org/music/Podington_Bear/Homage_Fromage/Massive_Attack
 
 
+Cutside - Secret Of 3rd Planet
+==============================
+File: music/Cutside_-_01_-_Secret_Of_3rd_Planet.ogg
+Modifications: Converted to OGG format.
+Author: Cutside
+License: CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+Source: http://freemusicarchive.org/music/Cutside/Empire_EP/01_-_Secret_Of_3rd_Planet
+
+
+fascinating earthbound objects - pangs
+======================================
+File: music/fascinating_earthbound_objects_-_03_-_pangs.ogg
+Modifications: Converted to OGG format.
+Author: fascinating earthbound objects
+License: CC BY-NC-SA 3.0 US https://creativecommons.org/licenses/by-nc-sa/3.0/us/
+Source: http://freemusicarchive.org/music/fascinating_earthbound_objects/simultaneous_eon/fascinating_earthbound_objects-03-pangs
+
+
+how the night came - Pris
+=========================
+File: music/how_the_night_came_-_06_-_6_Pris.ogg
+Modifications: Converted to OGG format.
+Author: how the night came
+License: CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
+Source: http://freemusicarchive.org/music/how_the_night_came/The_Tower_1337/6_Pris_1439
+
+
+Template for adding more songs
+==============================
+File:
+Modifications: Converted to OGG format.
+Author:
+License:
+Source:
+
+
+
 MODELS:
 
 Fishing Boat
