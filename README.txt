@@ -25,6 +25,9 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 
   python run_game.py
 
+Please make sure that you not running the game on notebook with battery saving turned on.
+The game runs slowly with nouveau drivers. Please use it with proprietary NVIDIA drivers.
+
 
 HOW TO PLAY THE GAME:
 

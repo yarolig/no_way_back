@@ -31,6 +31,41 @@ class Texture(object):
         glBindTexture(GL_TEXTURE_2D, 0)
 
 
+class Texture3D(object):
+    def __init__(self, filenames):
+        surfaces = []
+        for filename in filenames:
+            surfaces.append(pygame.image.load(filename))
+
+        depth = len(filenames)
+
+        h, w = 0, 0
+        ph, pw = 0, 0
+        data = ''
+        for s in surfaces:
+            data += pygame.image.tostring(s, 'RGBA', True)
+            w, h = s.get_size()
+            if ph:
+                assert ph == h and pw == w
+            pw, ph = w, h
+
+        self.id = glGenTextures(1)
+        glBindTexture(GL_TEXTURE_3D, self.id)
+        gluBuild3DMipmaps(GL_TEXTURE_3D, GL_RGBA8, w, h, depth, GL_RGBA, GL_UNSIGNED_BYTE, data)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+
+    def bind(self):
+        glDisable(GL_TEXTURE_2D)
+        glEnable(GL_TEXTURE_3D)
+        glBindTexture(GL_TEXTURE_3D, self.id)
+
+    @staticmethod
+    def unbind():
+        glBindTexture(GL_TEXTURE_3D, 0)
+        glDisable(GL_TEXTURE_3D)
+
+
 class VertexBuffer(object):
     def __init__(self, floats,
                  vertex_size=3, vertex_offset=0,

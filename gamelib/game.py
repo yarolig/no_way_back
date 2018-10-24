@@ -80,6 +80,17 @@ class Game(object):
         self.skybox.prepare()
 
     def prepare_race(self, racename):
+        self.tertex = glboilerplate.Texture3D([
+
+            filepath('dirt.png'),
+            filepath('dirt.png'),
+            filepath('sand.png'),
+            filepath('sand.png'),
+            filepath('grass.png'),
+            filepath('grass.png'),
+            filepath('hills.png'),
+            filepath('hills.png'),
+        ])
         self.race = race.Race()
         self.race.load(filepath(racename))
         sx, sy, sz = self.race.sx, self.race.sy, self.race.sz
@@ -111,6 +122,21 @@ class Game(object):
             else:
                 return (.8, .9, .9)
 
+        def w_for_e(e):
+            e /= sz
+            if e <= -25:
+                return 0/4.0
+            elif e <= -15:
+                return 0/4.0
+            elif e <= 25:
+                return 1/4.0
+            elif e <= 505:
+                return 2/4.0
+            elif e <= 905:
+                return 3/4.0
+            else:
+                return 4/4.0
+
         subx = 1
         suby = 1
         sx /= subx
@@ -119,7 +145,7 @@ class Game(object):
         floats = []
 
         def col(e):
-            r, g, b = color_for_e(e)
+            r, g, b = 1,1,1 #color_for_e(e)
             floats.append(r)
             floats.append(g)
             floats.append(b)
@@ -128,6 +154,11 @@ class Game(object):
             floats.append(x)
             floats.append(y)
             floats.append(z)
+
+            floats.append(x * 0.01)
+            floats.append(y * 0.01)
+            floats.append(w_for_e(z))
+
 
         for i in range(self.race.w * subx):
             logging.info('{}/{}'.format(i, self.race.w * subx))
@@ -152,7 +183,8 @@ class Game(object):
         self.terrain = glboilerplate.VertexBuffer(
             floats,
             vertex_size=3,
-            color_size=3, color_offset=3 * 4,
+            uv_size=3, uv_offset=3 * 4,
+            color_size=3, color_offset=6 * 4,
             mode=GL_QUADS)
         self.terrain.prepare()
 
@@ -366,7 +398,12 @@ class Game(object):
 
         for b in self.boats:
             b.draw(self)
+
+
+        self.tertex.bind()
         self.terrain.draw()
+        self.tertex.unbind()
+
         self.draw_water()
         self.no_lights()
         self.physics()
