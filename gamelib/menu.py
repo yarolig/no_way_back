@@ -35,19 +35,23 @@ def prepare_menu(app):
     #f.addButton("")
     #f.addButton("Impossible", action=ss('impossible'))
     #f.addButton("")
+
+    f.add_button("Testing lake", action=ss('test.png'))
+
+
     f.add_button("Butterfly lake", action=ss('lake.png'))
     f.add_button("Sunny islands", action=ss('sunny.png'))
-    f.add_button("Wind", action=ss('wind.png'))
+    #f.add_button("Wind", action=ss('wind.png'))
     f.add_button("Currents", action=ss('currents.png'))
-    f.add_button("Trading", action=ss('trading.png'))
-    f.add_button("Rivers", action=ss('rivers.png'))
+    #f.add_button("Trading", action=ss('trading.png'))
+    #f.add_button("Rivers", action=ss('rivers.png'))
     f.add_button("Railroad", action=ss('rail.png'))
-    f.add_button("Swamps", action=ss('swamps.png'))
+    #f.add_button("Swamps", action=ss('swamps.png'))
     f.add_button("Irrigation", action=ss('irrigation.png'))
-    f.add_button("Ice", action=ss('ice.png'))
-    f.add_button("Exotic", action=ss('exotic.png'))
-    f.add_button("Rescue", action=ss('rescue.png'))
-    f.add_button("Curl", action=ss('curl.png'))
+    #f.add_button("Ice", action=ss('ice.png'))
+    #f.add_button("Exotic", action=ss('exotic.png'))
+    #f.add_button("Rescue", action=ss('rescue.png'))
+    #f.add_button("Curl", action=ss('curl.png'))
 
     f.add_button("Back", action=lambda: app.select_menu(app.main_menu))
     app.new_menu = f

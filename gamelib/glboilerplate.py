@@ -14,7 +14,7 @@ class GlBoilerplateException(Exception):
 class Texture(object):
     def __init__(self, filename):
         surface = pygame.image.load(filename)
-        data = pygame.image.tostring(surface, 'RGBA', flipped=True)
+        data = pygame.image.tostring(surface, 'RGBA', True)
         w, h = surface.get_size()
 
         self.id = glGenTextures(1)
@@ -59,7 +59,7 @@ class VertexBuffer(object):
     def prepare(self):
         self.id = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.id)
-        print("{}".format(self.data[0:20]))
+        # print("{}".format(self.data[0:20]))
         glBufferData(GL_ARRAY_BUFFER, len(self.data)*4, self.data, GL_STATIC_DRAW)
         size = glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE)
         glBindBuffer(GL_ARRAY_BUFFER, 0)

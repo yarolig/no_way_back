@@ -133,7 +133,6 @@ class App(object):
                             self.select_menu(self.new_menu)
                         else:
                             self.controls.onKey(e.key, False, self.game.actions)
-                    # self.game.onKey(e.key)
                 if e.type == pygame.KEYDOWN:
                     if self.game:
                         self.controls.onKey(e.key, True, self.game.actions)
@@ -157,5 +156,3 @@ def main():
     app = App()
     app.init()
     app.mainloop()
-    print("Hello from your game's main()")
-    print(data.load('sample.txt').read())

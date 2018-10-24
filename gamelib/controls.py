@@ -17,6 +17,7 @@ def make_actions():
     actions['s'] = False
     actions['a'] = False
     actions['d'] = False
+    actions['c'] = False
     actions['anchor'] = False
     actions['enter'] = False
     return actions
@@ -40,6 +41,8 @@ class Controls(object):
         self.key_to_action[pygame.K_s] = 's'
         self.key_to_action[pygame.K_a] = 'a'
         self.key_to_action[pygame.K_d] = 'd'
+
+        self.key_to_action[pygame.K_c] = 'c'
 
         self.key_to_action[pygame.K_SPACE] = 'anchor'
         self.key_to_action[pygame.K_RETURN] = 'enter'

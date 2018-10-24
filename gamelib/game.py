@@ -13,6 +13,7 @@ import objloader
 from .data import *
 from . import controls
 from . import race
+from . import skybox
 
 
 def make_vector(x=0, y=0, z=0):
@@ -40,6 +41,7 @@ class Boat(object):
         angle = math.atan2(self.dir[1], self.dir[0])
         glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)
         game.draw_model(self.model)
+        # game.skybox.draw()
         glPopMatrix()
 
 
@@ -49,7 +51,7 @@ class Bouy(Boat):
 
 
 class Checkpoint(Boat):
-    model = 'checkpoint'
+    model = 'bouy'
     stationary = True
 
 
@@ -64,8 +66,8 @@ class Game(object):
         self.up = make_vector(0, 0, 1)
         self.models = {}
         self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
-        self.models['bouy'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
-        self.models['checkpoint'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
+        self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
+        self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
         self.clock = pygame.time.Clock()
         self.ticks = 0
 
@@ -73,14 +75,14 @@ class Game(object):
 
         self.prepare_race(racename)
         self.prepare_water()
+        self.prepare_deeps()
+        self.skybox = skybox.Skybox()
+        self.skybox.prepare()
 
     def prepare_race(self, racename):
         self.race = race.Race()
         self.race.load(filepath(racename))
-        sx, sy, sz = 20, 20, 1
-        self.race.sx = sx
-        self.race.sy = sy
-
+        sx, sy, sz = self.race.sx, self.race.sy, self.race.sz
         self.player.pos = make_vector(sx * self.race.startpos[0],
                                       sy * self.race.startpos[1])
         self.player.yaw = 270
@@ -154,9 +156,64 @@ class Game(object):
             mode=GL_QUADS)
         self.terrain.prepare()
 
+    def prepare_deeps(self):
+        deeps_scale = 10.0
+        deeps_overhang = 8
+        deeps_depth = -30.0
+
+        sx = self.race.sx * deeps_scale
+        sy = self.race.sx * deeps_scale
+        stx = 1.0
+        sty = 1.0
+        floats = []
+
+        maxrw =deeps_scale*(int(self.race.w / deeps_scale) + 2)
+        maxrh = deeps_scale*(int(self.race.h / deeps_scale) + 2)
+        maxr = max(maxrw, maxrh)
+        maxr = 1000.0
+        def tex(a, b):
+            floats.append(a)
+            floats.append(b)
+
+        def vert(x, y, z):
+            floats.append(x)
+            floats.append(y)
+            r2 = (x*x + y*y)
+            q = min(1000.0, (max(0, (maxr) ** 2 - r2))**0.5)
+            #print('{} {} {} dd={} r2={}'.format(x,y,q,(maxr), r2**0.5))
+            floats.append(-q - 0.5)
+
+        ib = -deeps_overhang
+        ie = int(self.race.w / deeps_scale) + deeps_overhang
+        jb = -deeps_overhang
+        je = int(self.race.h / deeps_scale) + deeps_overhang
+
+        for i in range(ib, ie):
+            for j in range(jb, je):
+                dd = deeps_depth
+
+                vert((i) * sx, (j) * sy, dd)
+                tex((i) * stx, (j) * sty)
+
+                vert((i + 1) * sx, (j) * sy, dd)
+                tex((i + 1) * stx, (j) * sty)
+
+                vert((i + 1) * sx, (j + 1) * sy, dd)
+                tex((i + 1) * stx, (j) * sty)
+
+                vert((i) * sx, (j + 1) * sy, dd)
+                tex((i) * stx, (j + 1) * sty)
+        self.deepsvb = glboilerplate.VertexBuffer(
+            floats,
+            uv_offset=8, uv_size=2,
+            vertex_offset=0,
+            mode=GL_QUADS
+        )
+        self.deepsvb.prepare()
+
     def prepare_water(self):
         water_scale = 5.0
-        water_overhang = 10
+        water_overhang = 15
         sx = self.race.sx * water_scale
         sy = self.race.sx * water_scale
         stx = 1.0
@@ -201,18 +258,31 @@ class Game(object):
 
         glCallList(self.models[name].gl_list)
 
+    def setup_skybox_camera(self):
+        self.setup_2d_camera()
+        glMatrixMode(GL_MODELVIEW)
+        #eye = - self.player.dir * 30.0 + self.up * 20.0
+        #tgt = self.player.dir * 0.0
+        eye = 3,4,5
+        tgt = 1,1,1
+        glLoadIdentity()
+        gluLookAt(eye[0], eye[1], eye[2],
+                  tgt[0], tgt[1], tgt[2],
+                  self.up[0], self.up[1], self.up[2])
+
+
     def setup_3d_camera(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         w, h = list(map(float, list(self.app.get_screen_size())))
-        gluPerspective(90.0, w / h, 1.0, 10000.0)
+        gluPerspective(90.0, w / h, 1.0, 3000.0)
 
         self.player.dir = make_vector(math.cos(self.player.yaw),
                                       math.sin(self.player.yaw),
                                       0)
         glMatrixMode(GL_MODELVIEW)
         eye = self.player.pos - self.player.dir * 30.0 + self.up * 20.0
-        tgt = self.player.pos + self.player.dir * 0.0
+        tgt = self.player.pos + self.player.dir * 30.0 + self.up * 10.0
         glLoadIdentity()
         gluLookAt(eye[0], eye[1], eye[2],
                   tgt[0], tgt[1], tgt[2],
@@ -257,15 +327,39 @@ class Game(object):
         glDisable(GL_LIGHTING)
 
     def draw_water(self):
+
+        glDisable(GL_BLEND)
+        #glColor4f(.9, .0, .0, 1.0)
+        glColor4f(.4, .4, .5, 1.0)
+        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glTranslatef(self.player.pos[0], self.player.pos[1], self.player.pos[2])
+        self.deepsvb.draw()
+
+        glPopMatrix()
+
         glEnable(GL_BLEND)
-        glColor4f(0.2, 0.4, 0.7, 0.5)
+        glColor4f(0.0, 0.07, 0.3, 0.5)
         glNormal3f(0.0, 0.0, 1.0)
         self.watervb.draw()
-        pass
+        glDisable(GL_BLEND)
+
 
     def draw(self):
         self.clock.tick()
+        self.setup_skybox_camera()
+
+        glColor4f(1,1,1,1)
+
         self.setup_3d_camera()
+
+        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glTranslatef(self.player.pos[0], self.player.pos[1], self.player.pos[2])
+        #angle = math.atan2(self.dir[1], self.dir[0])
+        #glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)
+
+        self.skybox.draw()
+        glPopMatrix()
+
 
         self.setup_lights()
         self.player.draw(self)

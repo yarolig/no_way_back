@@ -6,6 +6,8 @@ import logging
 import pygame
 import time
 import noise
+import json
+import os
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -337,7 +339,41 @@ class Race(object):
                     for an in self.anomalies:
                         self.currents[x][y] += an.anomaly(x,y)
 
+    def save_default_race_conf(self, name):
+        fo = open(name, 'w')
+        fo.write('''
+{
+    "scale_x" : "20.0",
+    "scale_y" : "20.0",
+    "scale_z" : "2.0",
+    "biome"   : "default",
+    "prenoise"   : "1",
+    "smooth"   : "2",
+    "postnoise"   : "1",
+
+    "placeholder1" : "1.0",
+    "placeholder2" : "1.0"
+}
+''')
+        fo.close()
+
+    def load_race_conf(self, name):
+        #if not os.path.exists(name):
+        #    pass
+
+        self.save_default_race_conf(name)
+
+        f = json.load(open(name))
+        self.config = f
+        self.sx = float(self.config['scale_x'])
+        self.sy = float(self.config['scale_y'])
+        self.sz = float(self.config['scale_z'])
+        self.prenoise = int(self.config['prenoise'])
+        self.smooth = int(self.config['smooth'])
+        self.postnoise = int(self.config['postnoise'])
+
     def load(self, name):
+        self.load_race_conf(name.replace('.png', '.json'))
         img = pygame.image.load(name)
         w, h = img.get_size()
         self.w = w
@@ -350,22 +386,28 @@ class Race(object):
         self.vb = VertexBuffer(size=w * h * CELL_SUBDIVIDE_SQUARED * VERTEX_SIZE)
         for y in range(h):
             for x in range(w):
-                c = hc(img.get_at((y, x)))
+                c = hc(img.get_at((x, h - y - 1)))
                 f = color_actions.get(c)
                 if f:
-                    #print("{} {} {} {}".format(f, c,x,y))
                     f(self, x, y)
                 else:
                     color_actions[c] = lambda s, x, y: None
                     logging.warn('Please add @for_color(pygame.Color{})'.format(c))
         logging.info('calculating currents')
         self.calc_currents()
-        logging.info('noising')
-        self.noise_heightmap()
-        for i in range(2):
-             logging.info('softening heightmap')
-             self.soften_heightmap()
-        #self.noise_heightmap()
+
+        for i in xrange(self.prenoise):
+            logging.info('noising')
+            self.noise_heightmap()
+
+        for i in xrange(self.smooth):
+            logging.info('bluring')
+            self.soften_heightmap()
+
+        for i in xrange(self.postnoise):
+            logging.info('noising')
+            self.noise_heightmap()
+
 
 if __name__ == '__main__':
     r = Race()

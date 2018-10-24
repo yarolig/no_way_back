@@ -35,8 +35,8 @@ class Mus(object):
         t.file = 'how_the_night_came_-_06_-_6_Pris.ogg'
         t.ls_time = 99.2
         self.tracks.append(t)
-        self.current_track = t
-        # self.current_track = random.choice(self.tracks)
+
+        self.current_track = random.choice(self.tracks)
 
     def init(self):
         pass

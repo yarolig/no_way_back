@@ -85,8 +85,7 @@ License:
 Source:
 
 
-
-MODELS:
+MODELS AND OTHER GRAPHICS:
 
 Fishing Boat
 ============
@@ -100,3 +99,13 @@ Modifications: Removed files that not needed for the game. Reduced quality and s
 Author: Jason Campbell
 License: CC0 1.0 Universal https://creativecommons.org/publicdomain/zero/1.0/
 Source: https://opengameart.org/content/fishing-boat-low-poly
+
+
+Cloudy Sky
+==========
+Original Name: https://hdrihaven.com/hdri/?c=skies&h=mud_road
+File: models/mud_road_2k.jpg
+Modifications: a lot of modifications.
+Author: Sergey Rudavin
+License: CC0 1.0 Universal https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://hdrihaven.com/hdri/?c=skies&h=mud_road
