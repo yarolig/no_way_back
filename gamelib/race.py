@@ -163,6 +163,10 @@ class Race(object):
         z = self.heightmap[int(x)%self.w][int(y)%self.h]
         return z
 
+    def getfz2(self,x,y):
+        z = self.heightmap[int(x)%self.w][int(y)%self.h]
+        z = self.my_noise(x,y) + z
+        return z
 
     def getfz(self,x,y):
         z = self.heightmap[int(x)%self.w][int(y)%self.h]
@@ -181,22 +185,23 @@ class Race(object):
 
     def getz_noised(self,x,y):
         z = self.heightmap[int(x)%self.w][int(y)%self.h]
+        n = self.noisemap[int(x)%self.w][int(y)%self.h]
         if z > 0.5:
             k = 1 #k = z - 1 if z - 1 < 1 else 1
-            z += k*10*self.small_positive_noise(x,y)
+            z += k*n*self.small_positive_noise(x,y)
         elif z < 0.5:
             k = 1
-            z += k*-10*self.small_positive_noise(x,y)
+            z += k*-n*self.small_positive_noise(x,y)
         return z
 
     @for_color(pygame.Color(255, 255, 0))
     def sand(self, x, y):
         self.heightmap[x][y] = 1
-        self.noisemap[x][y] = 0
+        self.noisemap[x][y] = 0.1
 
     @for_color(pygame.Color(0, 128, 0))
     def hills(self, x, y):
-        self.heightmap[x][y] = 20
+        self.heightmap[x][y] = 30
         self.noisemap[x][y] = 10
 
     @for_color(pygame.Color(255, 0, 0))
@@ -218,13 +223,13 @@ class Race(object):
 
     @for_color(pygame.Color(128, 128, 128))
     def wall(self, x, y):
-        self.heightmap[x][y] = 10
+        self.heightmap[x][y] = 20
         self.noisemap[x][y] = 0
 
     @for_color(pygame.Color(0, 255, 255))
     def lake(self, x, y):
         self.heightmap[x][y] = -10
-        self.noisemap[x][y] = 0
+        self.noisemap[x][y] = 10.0
 
     @for_color(pygame.Color(255, 128, 0))
     def buoy(self, x, y):
@@ -235,12 +240,12 @@ class Race(object):
     @for_color(pygame.Color(0, 0, 128))
     def ocean(self, x, y):
         self.heightmap[x][y] = -100
-        self.noisemap[x][y] = 0
+        self.noisemap[x][y] = 50.0
 
     @for_color(pygame.Color(0, 0, 255))
     def sea(self, x, y):
         self.heightmap[x][y] = -50
-        self.noisemap[x][y] = 0
+        self.noisemap[x][y] = 25.0
 
     @for_color(pygame.Color(128, 255, 128))
     def sink(self, x, y):

@@ -2,3 +2,4 @@ pygame
 PyOpenGL
 numpy
 noise
+PyWavefront

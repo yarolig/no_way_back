@@ -1,6 +1,6 @@
 # Blender v2.72 (sub 0) OBJ File: 'bouy.blend'
 # www.blender.org
-mtllib data/bouy.mtl
+mtllib bouy.mtl
 o Icosphere
 v -0.000001 -13.759494 -0.000001
 v 7.236072 -8.231688 5.257253

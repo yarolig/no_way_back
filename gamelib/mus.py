@@ -16,6 +16,10 @@ class Mus(object):
         self.app = app
         self.music = None
         self.tracks = []
+#        pygame.mixer.init()
+
+        self.sounds = {}
+
 
         t = Track()
         # t.file = 'Podington_Bear_-_11_-_Massive_Attack.ogg'
@@ -36,6 +40,7 @@ class Mus(object):
         t.ls_time = 99.2
         self.tracks.append(t)
 
+
         self.current_track = random.choice(self.tracks)
 
     def init(self):
@@ -48,6 +53,11 @@ class Mus(object):
         self.music.load(music_file)
         self.music.play(loops=-1)
 
+        self.sounds['impact'] = pygame.mixer.Sound(data.musicpath('274943__theshaggyfreak__knock-knock1.ogg'))
+        self.sounds['checkpoint'] = pygame.mixer.Sound(data.musicpath('332629__treasuresounds__item-pickup.ogg'))
+        self.sounds['win'] = pygame.mixer.Sound(data.musicpath('147256__pjcohen__skiba22edge.ogg'))
+
+
     def onLevelStart(self, level):
 
         if self.current_track.ls_time:
@@ -58,3 +68,5 @@ class Mus(object):
              self.music.fadeout(500)
              time.sleep(0.5)
              self.music = None
+    def effect(self,name):
+        self.sounds[name].play()

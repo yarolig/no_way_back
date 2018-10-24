@@ -79,6 +79,44 @@ License: CC BY-NC-SA 4.0 https://creativecommons.org/licenses/by-nc-sa/4.0/
 Source: http://freemusicarchive.org/music/how_the_night_came/The_Tower_1337/6_Pris_1439
 
 
+SOUND EFFECTS:
+
+Race complete
+=============
+File: 147256__pjcohen__skiba22edge.ogg
+Modifications: Converted to OGG format.
+Author: pjcohen
+License: CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+Source: https://freesound.org/people/pjcohen/sounds/147256/
+
+
+Impact
+======
+File: 274943__theshaggyfreak__knock-knock1.ogg
+Modifications: Converted to OGG format.
+Author: William Chrapcynski
+License: CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+Source: https://freesound.org/people/theshaggyfreak/sounds/274943/
+
+
+Checkpoint
+==========
+File: 332629__treasuresounds__item-pickup.ogg
+Modifications: Converted to OGG format.
+Author: TreasureSounds
+License: CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+Source: https://freesound.org/people/TreasureSounds/sounds/332629/
+
+
+Impact sound (unused)
+=====================
+File: music/352114__inspectorj__dropping-wood-h.wav
+Modifications: none
+Author: Jonathan Shaw
+License: CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
+Source: https://freesound.org/people/InspectorJ/sounds/352114/
+
+
 Template for adding more songs
 ==============================
 File:

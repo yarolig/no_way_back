@@ -1,6 +1,6 @@
 # Blender v2.72 (sub 0) OBJ File: 'checkpoint.blend'
 # www.blender.org
-mtllib data/checkpoint.mtl
+mtllib checkpoint.mtl
 o Sphere
 v -0.923880 -0.382683 0.000000
 v -0.980785 -0.195090 0.000000

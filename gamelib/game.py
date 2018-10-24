@@ -9,7 +9,11 @@ import time
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
+
 import objloader
+import pywavefront
+import pywavefront.visualization
+
 from .data import *
 from . import controls
 from . import race
@@ -23,6 +27,20 @@ def make_vector(x=0, y=0, z=0):
     v[2] = z
     return v
 
+def vector_len(v):
+    x, y, z = v
+    r = (x*x+y*y+z*z)**0.5
+    return r
+
+
+def bind_texture_hack(texture):
+    if not getattr(texture, 'image', None):
+        texture.image = glboilerplate.Texture(texture.path)
+        texture.image.target = GL_TEXTURE_2D
+        texture.image.id = texture.image.id
+    texture.image.bind()
+
+pywavefront.visualization.bind_texture = bind_texture_hack
 
 class Boat(object):
     model = 'boat'
@@ -53,6 +71,7 @@ class Bouy(Boat):
 class Checkpoint(Boat):
     model = 'bouy'
     stationary = True
+    visited = False
 
 
 class Game(object):
@@ -63,11 +82,22 @@ class Game(object):
         p.dir = make_vector(0, 1, 0)
         self.player = p
         self.boats = []
+        self.checkpoints = []
         self.up = make_vector(0, 0, 1)
         self.models = {}
-        self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
-        self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
-        self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
+
+
+
+        #self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
+        #self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
+        #self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
+
+        self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
+        self.models['bouy'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
+        self.models['checkpoint'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
+
+
+
         self.clock = pygame.time.Clock()
         self.ticks = 0
 
@@ -107,7 +137,7 @@ class Game(object):
             b = Checkpoint()
             b.pos = make_vector(sx * x, sy * y, 1)
             self.boats.append(b)
-
+            self.checkpoints.append(b)
         def color_for_e(e):
             if e <= -25:
                 return (.4, .4, .5)
@@ -288,7 +318,14 @@ class Game(object):
             logging.error("Model {} not loaded".format(name))
             return
 
-        glCallList(self.models[name].gl_list)
+        #glCallList(self.models[name].gl_list)
+
+        glMatrixMode(GL_MODELVIEW)
+        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glTranslate(0,0,10)
+        glRotate(90, 1,0,0)
+        pywavefront.visualization.draw(self.models[name])
+        glPopMatrix()
 
     def setup_skybox_camera(self):
         self.setup_2d_camera()
@@ -307,7 +344,7 @@ class Game(object):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         w, h = list(map(float, list(self.app.get_screen_size())))
-        gluPerspective(90.0, w / h, 1.0, 3000.0)
+        gluPerspective(90.0, w / h, 1.0, 3000.0* 10)
 
         self.player.dir = make_vector(math.cos(self.player.yaw),
                                       math.sin(self.player.yaw),
@@ -407,12 +444,34 @@ class Game(object):
         self.draw_water()
         self.no_lights()
         self.physics()
+        self.logic()
 
         self.ticks += 1
         if self.ticks % 100 == 0:
             pygame.display.set_caption("pyweek26: No Way Back FPS:{}".format(self.clock.get_fps()))
 
         self.setup_2d_camera()
+
+    def logic(self):
+        win = True
+        hit = False
+        for cp in self.checkpoints:
+            if cp.visited:
+                continue
+            win = False
+            d = cp.pos - self.player.pos
+            if vector_len(d) < 30:
+                cp.visited = True
+                hit = True
+
+        if win:
+            self.app.mus.effect('win')
+            for cp in self.checkpoints:
+                cp.visited = False
+        elif hit:
+            self.app.mus.effect('checkpoint')
+
+
 
     def debug_currents(self):
         boat = self.player
@@ -452,7 +511,22 @@ class Game(object):
     def phy_boat(self, boat):
         if boat.stationary:
             return
-        boat.pos += boat.vel
+
+
+        for i in range(1,3):
+            l = 1.0 / max(1.0, vector_len(boat.vel))
+            direction = boat.vel * l
+
+            newpos = boat.pos + direction * i * 4.0
+            newz = self.race.getfz2((newpos[0] + 0.5*self.race.sx)/self.race.sx,
+                                    (newpos[1] + 0.5*self.race.sy)/self.race.sy)
+            if newz > 0.0:
+                boat.vel = -0.9 / i  * boat.vel
+                self.app.mus.effect('impact')
+                break
+        else:
+            boat.pos += boat.vel
+
         xx = int(boat.pos[0] / self.race.sx)
         yy = int(boat.pos[1] / self.race.sy)
         current = self.race.get_current(xx, yy)

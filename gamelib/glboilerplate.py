@@ -24,11 +24,13 @@ class Texture(object):
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
 
     def bind(self):
+        glEnable(GL_TEXTURE_2D)
         glBindTexture(GL_TEXTURE_2D, self.id)
 
     @staticmethod
     def unbind():
         glBindTexture(GL_TEXTURE_2D, 0)
+        glDisable(GL_TEXTURE_2D)
 
 
 class Texture3D(object):
