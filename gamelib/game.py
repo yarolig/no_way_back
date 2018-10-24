@@ -12,7 +12,6 @@ from OpenGL.GLU import *
 import objloader
 from .data import *
 from . import controls
-from . import worldgen
 from . import race
 
 
