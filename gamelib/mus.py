@@ -100,10 +100,10 @@ class Mus(object):
             if t is not self.current_track:
                 self.current_track = t
                 break
-        self.music.fadeout(300)
         music_file = data.musicpath(self.current_track.file)
         self.music.load(music_file)
-        self.music.play(loops=-1)
+        self.music.set_volume(float(self.app.config['MusicVolume']))
+        self.music.play(loops=0)
 
     def onLevelEnd(self):
         pass

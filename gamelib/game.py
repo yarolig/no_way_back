@@ -48,7 +48,8 @@ class Boat(object):
     model = 'boat'
     stationary = False
     vel_fade = 0.98
-    hp = 100
+    hp = 10
+    maxhp = 10
     destroy_on_impact = False
     destroyed = False
     quiet = False
@@ -75,6 +76,11 @@ class Bouy(Boat):
 
 
 class Checkpoint(Boat):
+    model = 'bouy'
+    stationary = True
+    visited = False
+
+class Endpoint(Boat):
     model = 'bouy'
     stationary = True
     visited = False
@@ -136,11 +142,30 @@ class Game(object):
         self.frame = gui.Frame(self.app)
         self.counter = self.frame.add_button("99")
         self.counter.x = self.app.get_screen_size()[0] / 2 - 10
+
+        self.frame.pxsize = 32
+        self.frame.ypos = 32
         self.hpbar = self.frame.add_volumebox()
         self.counter.color =  pygame.Color('yellow')
-        self.frame.ypos = self.app.get_screen_size()[1] - 64
-        self.hpbar.color = pygame.Color(40, 170, 190)
 
+        self.hpbar.color = pygame.Color(140, 200, 230)
+
+    def update_hpbar(self):
+        self.hpbar.value = max(0, self.player.hp)
+        self.hpbar.maxvalue = self.player.maxhp
+
+    def update_counter(self):
+
+        if self.winned:
+            self.counter.text = "Win!"
+        elif self.losed:
+            self.counter.color = pygame.Color(230, 120, 120)
+            self.counter.text = "Fail!"
+        else:
+            if self.timer_inc:
+                self.counter.text = "{}".format(self.time_left)
+            else:
+                self.counter.text = "--"
     def __init__(self, app, racename='race1.png'):
         self.app = app
         self.racename = racename
@@ -157,6 +182,8 @@ class Game(object):
         self.losed = False
         self.up = make_vector(0, 0, 1)
         self.models = {}
+        self.time_left = 0
+        self.timer_inc = 0
 
         #self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
         #self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
@@ -172,6 +199,7 @@ class Game(object):
         self.actions = controls.make_actions()
 
         self.prepare_race(racename)
+        self.init_race_logic()
         self.prepare_water()
         self.prepare_deeps()
         self.skybox = skybox.Skybox()
@@ -200,11 +228,23 @@ class Game(object):
             b.pos = make_vector(sx * x, sy * y, 0)
             self.boats.append(b)
 
+        for x, y in self.race.boats:
+            b = Boat()
+            b.pos = make_vector(sx * x, sy * y, 0)
+            self.boats.append(b)
+
         for x, y in self.race.checkpoints:
             b = Checkpoint()
             b.pos = make_vector(sx * x, sy * y, 1)
             self.boats.append(b)
             self.checkpoints.append(b)
+
+        for x, y in self.race.endpoints:
+            b = Endpoint()
+            b.pos = make_vector(sx * x, sy * y, 1)
+            self.boats.append(b)
+            self.endpoints.append(b)
+
         def color_for_e(e):
             if e <= -25:
                 return (.4, .4, .5)
@@ -539,7 +579,52 @@ class Game(object):
         else:
             self.clock.tick_busy_loop(60)
 
+    def init_race_logic(self):
+        if self.race.config['type'] == 'checkpoints':
+            self.time_left = int(self.race.config['start_time'])
+        elif self.race.config['type'] == 'countdown':
+            self.time_left = int(self.race.config['start_time'])
+            self.timer_inc = -1
+        elif self.race.config['type'] == 'countup':
+            self.time_left = 0
+            self.timer_inc = 1
+
+    def checkpoint_hitted(self):
+        if self.race.config['type'] == 'checkpoints':
+            if not self.timer_inc:
+                self.timer_inc = -1
+                self.time_left = int(self.race.config['start_time'])
+            self.time_left += int(self.race.config['cp_time'])
+        elif self.race.config['type'] == 'countdown':
+            pass
+        elif self.race.config['type'] == 'countup':
+            pass
+
+    def race_logic(self):
+        if self.race.config['type'] == 'checkpoints':
+            if self.timer_inc:
+               if self.time_left < 0:
+                   self.losed = True
+                   self.timer_inc = 0
+        elif self.race.config['type'] == 'countdown':
+            if self.timer_inc:
+               if self.time_left < 0:
+                   self.losed = True
+                   self.timer_inc = 0
+        elif self.race.config['type'] == 'countup':
+            pass
+
     def logic(self):
+        self.update_hpbar()
+        if self.ticks % 50 == 0:
+            self.race_logic()
+            self.update_counter()
+            self.time_left += self.timer_inc
+
+        if self.player.hp <= 0:
+            self.losed = True
+
+
         if self.winned or self.losed:
             return
 
@@ -573,6 +658,7 @@ class Game(object):
             for cp in self.checkpoints:
                 cp.visited = False
         elif hit:
+            self.checkpoint_hitted()
             self.app.mus.effect('checkpoint')
 
     def on_win(self):
@@ -671,10 +757,12 @@ class Game(object):
                                     (newpos[1] + 0.5*self.race.sy)/self.race.sy)
             if newz > 0.0:
                 boat.vel = -0.9 / i  * boat.vel
+
                 if not boat.quiet:
                     self.app.mus.effect('impact')
                 if boat.destroy_on_impact:
                     boat.destroyed = True
+                boat.hp -= 1
         else:
             boat.pos += boat.vel
 

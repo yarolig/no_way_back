@@ -136,7 +136,9 @@ class Race(object):
         self.h = 0
         self.startpos = (0, 0)
         self.checkpoints = []
+        self.endpoints = []
         self.bouys = []
+        self.boats = []
         self.fzcache = None
         self.anomalies = []
 
@@ -229,6 +231,12 @@ class Race(object):
         self.noisemap[x][y] = 0
         self.checkpoints.append((x, y))
 
+    @for_color(pygame.Color(255, 127, 127))
+    def endpoint(self, x, y):
+        self.heightmap[x][y] = self.heightmap[x - 1][y]
+        self.noisemap[x][y] = 0
+        self.endpoints.append((x, y))
+
     @for_color(pygame.Color(0, 0, 0))
     def mountains(self, x, y):
         self.heightmap[x][y] = 300
@@ -249,6 +257,12 @@ class Race(object):
         self.heightmap[x][y] = self.heightmap[x - 1][y]
         self.noisemap[x][y] = 0
         self.bouys.append((x, y))
+
+    @for_color(pygame.Color(0, 255, 0))
+    def boat(self, x, y):
+        self.heightmap[x][y] = self.heightmap[x - 1][y]
+        self.noisemap[x][y] = 0
+        self.boats.append((x, y))
 
     @for_color(pygame.Color(0, 0, 128))
     def ocean(self, x, y):
@@ -369,7 +383,10 @@ class Race(object):
             "next_races": "lake",
             "intro": "This is a simple race, nothing unusual",
             "outro": "Race completed!",
-            "time_limit": "99",
+
+            "start_time": "30",
+            "cp_time": "15",
+            "type" : 'checkpoints',
 
             "placeholder1": "1.0",
             "placeholder2": "1.0"
