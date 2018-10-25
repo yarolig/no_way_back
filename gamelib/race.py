@@ -78,7 +78,7 @@ A_GEYSER = 5
 
 
 class Anomaly(object):
-    def __init__(self, x, y, force=1.0, range=10):
+    def __init__(self, x, y, force=0.0, range=10):
         self.x = x
         self.y = y
         self.force = force
@@ -306,7 +306,7 @@ class Race(object):
         self.noisemap[x][y] = 0
         a = CurlAnomaly(x, y)
         a.range = 8
-        a.force = 1.0
+        a.force = 0.000
         self.anomalies.append(a)
 
     @for_color(pygame.Color(255, 128, 128))

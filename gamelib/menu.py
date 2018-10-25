@@ -54,10 +54,11 @@ def prepare_menu(app):
         # ['Railroad', 'rail.png'],
         ['Swamps', 'swamps.png'],
         ['Irrigation', 'irrigation.png'],
-        #['Ice', 'ice.png'],
-        #['Exotic', 'exotic.png'],
+        ['Ice', 'ice.png'],
+        ['Exotic', 'exotic.png'],
         ['Rescue', 'rescue.png'],
-        #['Curl', 'curl.png'],
+        ['Irrigation2', 'irrigation2.png'],
+        ['Curl', 'curl.png'],
     ]
     app.set_race_available('test.png')
     app.set_race_available('lake.png')
