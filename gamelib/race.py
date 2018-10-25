@@ -122,10 +122,15 @@ class CurlAnomaly(Anomaly):
         distance = (d[0] ** 2 + d[1] ** 2) ** 0.5
         if distance < 0.001:
             return (0.0, 0.0)
+
+        range_multiplier = 1.0
+        if distance > 0.5 * self.range:
+            range_multiplier = (distance - 0.5 * self.range) / (0.5 * self.range)
+
         if distance > self.range:
             return (0.0, 0.0)
         direction = (d[0] / distance, d[1] / distance)
-        value = self.value_multiplier * self.force
+        value = range_multiplier * self.value_multiplier * self.force
         return (-direction[1] * value, direction[0] * value)
 
 
@@ -293,6 +298,15 @@ class Race(object):
         self.noisemap[x][y] = 0
         a = CurlAnomaly(x, y)
         a.range = 40
+        self.anomalies.append(a)
+
+    @for_color(pygame.Color(255, 127, 255))
+    def softcurl(self, x, y):
+        self.heightmap[x][y] = -50
+        self.noisemap[x][y] = 0
+        a = CurlAnomaly(x, y)
+        a.range = 8
+        a.force = 1.0
         self.anomalies.append(a)
 
     @for_color(pygame.Color(255, 128, 128))
