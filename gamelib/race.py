@@ -242,6 +242,11 @@ class Race(object):
         self.heightmap[x][y] = 300
         self.noisemap[x][y] = 100
 
+    @for_color(pygame.Color(192, 192, 192))
+    def rough(self, x, y):
+        self.heightmap[x][y] = 50
+        self.noisemap[x][y] = 50
+
     @for_color(pygame.Color(128, 128, 128))
     def wall(self, x, y):
         self.heightmap[x][y] = 20

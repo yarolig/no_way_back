@@ -585,7 +585,8 @@ class Game(object):
         self.player.draw(self)
 
         for b in self.boats:
-            b.draw(self)
+            if vector_len(b.pos - self.player.pos) < 1000.0:
+                b.draw(self)
 
         self.tertex.bind()
         self.terrain.draw()
@@ -802,7 +803,7 @@ class Game(object):
         yaw_force = boat.rudder * (fwd_vel * 0.1 + 0.03)
         boat.dyaw += yaw_force
 
-        print ('yf:{}'.format(yaw_force))
+        #print ('yf:{}'.format(yaw_force))
         #if self.ticks% 30 == 0:
         #    print({'sd': side_dir, 'fd': fwd_dir})
         #    print({'fp': fwd_dp, 'sp': side_dp})
