@@ -61,7 +61,7 @@ A_GEYSER = 5
 
 
 class Anomaly(object):
-    def __init__(self, x, y, force=0.1, range=10):
+    def __init__(self, x, y, force=1.0, range=10):
         self.x = x
         self.y = y
         self.force = force
@@ -292,7 +292,6 @@ class Race(object):
         new_heightmap = np.ndarray(shape=(w, h), dtype=float)
         for y in range(h):
             for x in range(w):
-
                 if (math.fabs(self.heightmap[x][y]) <= 1.0
                     or x == 0 or y == 0
                     or x == w - 1 or y == h - 1):
@@ -321,15 +320,14 @@ class Race(object):
                 if self.heightmap[x][y] <= 0:
                     new_heightmap[x][y] = self.heightmap[x][y]
                 else:
-                    sum = 0.0
+                    summ = 0.0
                     for dx, dy in dirs:
-                        sum += self.getz(x + dx, y + dy)
-                    new_heightmap[x][y] = sum / len(dirs)
+                        summ += self.getz(x + dx, y + dy)
+                    new_heightmap[x][y] = summ / len(dirs)
         self.heightmap = new_heightmap
 
     def enum_currents(self, x, y):
         if 0 <= x < self.w and 0 <= y < self.h:
-            sum = np.ndarray(shape=(2,), dtype=float)
             if self.heightmap[x][y] >= 100.3:
                 pass
             else:
@@ -337,27 +335,17 @@ class Race(object):
                     yield an.anomaly(x, y)
 
     def get_current(self, x, y):
-        sum = np.ndarray(shape=(2,), dtype=float)
+        summ = np.ndarray(shape=(2,), dtype=float)
+        summ[0]=0
+        summ[1]=0
         for (x, y) in self.enum_currents(x, y):
-            sum += (x, y)
+            summ += (x, y)
         result = np.ndarray(shape=(3,), dtype=float)
-        result[0] = sum[0]
-        result[1] = sum[1]
+        result[0] = summ[0]
+        result[1] = summ[1]
         result[2] = 0
+        #print(["get_current",x,y,result])
         return result
-
-    def calc_currents(self):
-        return
-        w = self.w
-        h = self.h
-        for y in range(h):
-            for x in range(w):
-                if self.heightmap[x][y] <= -0.3:
-                    self.currents[x][y][0] = 0
-                    self.currents[x][y][1] = 0
-                else:
-                    for an in self.anomalies:
-                        self.currents[x][y] += an.anomaly(x, y)
 
     def save_default_race_conf(self, name):
         self.save_race_conf({
@@ -421,8 +409,6 @@ class Race(object):
                 else:
                     color_actions[c] = lambda s, x, y: None
                     logging.warn('Please add @for_color(pygame.Color{})'.format(c))
-        logging.info('calculating currents')
-        #self.calc_currents()
 
         for i in range(self.prenoise):
             logging.info('noising')

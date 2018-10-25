@@ -605,7 +605,7 @@ class Game(object):
         self.setup_2d_camera()
         self.frame.draw()
 
-        if False:
+        if True:
             self.clock.tick(60)
         else:
             self.clock.tick_busy_loop(60)
@@ -790,7 +790,8 @@ class Game(object):
         xx = int(boat.pos[0] / self.race.sx)
         yy = int(boat.pos[1] / self.race.sy)
         current = self.race.get_current(xx, yy)
-        # logging.info('current current {}'.format(current))
+        if boat is self.player:
+          logging.info('current current {} at {} {}'.format(current,xx,yy))
         boat.vel += current
 
         side_dir = normalized_vector(make_vector(boat.dir[1], -boat.dir[0], boat.dir[2]))
