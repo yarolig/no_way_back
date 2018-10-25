@@ -29,10 +29,22 @@ def make_vector(x=0, y=0, z=0):
     v[2] = z
     return v
 
+
 def vector_len(v):
     x, y, z = v
-    r = (x*x+y*y+z*z)**0.5
+    r = (x * x + y * y + z * z) ** 0.5
     return r
+
+
+def normalized_vector(v):
+    l = vector_len(v)
+    if math.fabs(l) < 0.001:
+        return v
+    return v * (1.0 / l)
+
+
+def dot_product(va, vb):
+    return va[0] * vb[0] + va[1] * vb[1] + va[2] * vb[2]
 
 
 def bind_texture_hack(texture):
@@ -42,7 +54,9 @@ def bind_texture_hack(texture):
         texture.image.id = texture.image.id
     texture.image.bind()
 
+
 pywavefront.visualization.bind_texture = bind_texture_hack
+
 
 class Boat(object):
     model = 'boat'
@@ -59,6 +73,14 @@ class Boat(object):
         self.pos = make_vector(0, 0, 0)
         self.dir = make_vector(1, 1, 0)
         self.yaw = 0
+        self.rudder = 0
+        self.dyaw = 0
+
+        self.roll = 0
+        self.droll = 0
+        self.pitch = 0
+        self.dpitch = 0
+
         self.vel = make_vector(0, 0, 0)
 
     def draw(self, game):
@@ -77,14 +99,16 @@ class Bouy(Boat):
 
 
 class Checkpoint(Boat):
-    model = 'bouy'
+    model = 'checkpoint'
     stationary = True
     visited = False
 
+
 class Endpoint(Boat):
-    model = 'bouy'
+    model = 'endpoint'
     stationary = True
     visited = False
+
 
 class Debris(Boat):
     model = 'bouy'
@@ -102,28 +126,28 @@ class Debris(Boat):
         v = make_vector()
         v += self.pos
         self.path.append(v)
-        #else:
+        # else:
         #    print('prev:{} curr:{}'.format(self.prevpos, self.pos))
 
-        #upos = self.pos + (0,0,10)
-        #glColor3f(1,1,1,1)
-        #glVertex3f(self.pos[0], self.pos[1], self.pos[2])
-        #glVertex3f(upos[0], upos[1], upos[2])
+        # upos = self.pos + (0,0,10)
+        # glColor3f(1,1,1,1)
+        # glVertex3f(self.pos[0], self.pos[1], self.pos[2])
+        # glVertex3f(upos[0], upos[1], upos[2])
 
         if self.ttl < 100:
-            glColor4f(0.01*self.ttl,
-                      0.01*self.ttl,
-                      0.01*self.ttl,
-                      0.01*self.ttl)
+            glColor4f(0.01 * self.ttl,
+                      0.01 * self.ttl,
+                      0.01 * self.ttl,
+                      0.01 * self.ttl)
         else:
-            glColor4f(1,1,1,0.5)
+            glColor4f(1, 1, 1, 0.5)
 
         pl = len(self.path)
         p0 = 0
-        p1 = int(0.1*pl)
-        p2 = int(0.3*pl)
-        p3 = int(0.5*pl)
-        p4 = int(0.9*pl)
+        p1 = int(0.1 * pl)
+        p2 = int(0.3 * pl)
+        p3 = int(0.5 * pl)
+        p4 = int(0.9 * pl)
         glVertex3f(self.pos[0], self.pos[1], self.pos[2])
         glVertex3f(self.path[p4][0], self.path[p4][1], self.path[p4][2])
 
@@ -139,6 +163,7 @@ class Debris(Boat):
         glVertex3f(self.path[p1][0], self.path[p1][1], self.path[p1][2])
         glVertex3f(self.path[p0][0], self.path[p0][1], self.path[p0][2])
 
+
 class Game(object):
     def init_gui(self):
         self.frame = gui.Frame(self.app)
@@ -148,7 +173,7 @@ class Game(object):
         self.frame.pxsize = 32
         self.frame.ypos = 32
         self.hpbar = self.frame.add_volumebox()
-        self.counter.color =  pygame.Color('yellow')
+        self.counter.color = pygame.Color('yellow')
 
         self.hpbar.color = pygame.Color(140, 200, 230)
 
@@ -168,6 +193,7 @@ class Game(object):
                 self.counter.text = "{}".format(self.time_left)
             else:
                 self.counter.text = "--"
+
     def __init__(self, app, racename='race1.png'):
         self.app = app
         self.racename = racename
@@ -187,15 +213,15 @@ class Game(object):
         self.time_left = 0
         self.timer_inc = 0
 
-        #self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
-        #self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
-        #self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
+        # self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
+        # self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
+        # self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
 
-        #self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
+        # self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
 
         self.models['boat'] = pywavefront.Wavefront(filepath('motorboat.obj'))
-        self.models['bouy'] = pywavefront.Wavefront(filepath('bouy.obj'))
-        self.models['checkpoint'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
+        self.models['bouy'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
+        self.models['checkpoint'] = pywavefront.Wavefront(filepath('buoy.obj'))
         self.models['endpoint'] = pywavefront.Wavefront(filepath('endpoint.obj'))
 
         self.clock = pygame.time.Clock()
@@ -236,6 +262,7 @@ class Game(object):
         for x, y in self.race.boats:
             b = Boat()
             b.pos = make_vector(sx * x, sy * y, 0)
+            b.destroy_on_impact = True
             self.boats.append(b)
 
         for x, y in self.race.checkpoints:
@@ -267,17 +294,17 @@ class Game(object):
         def w_for_e(e):
             e /= sz
             if e <= -25:
-                return 0/4.0
+                return 0 / 4.0
             elif e <= -15:
-                return 0/4.0
+                return 0 / 4.0
             elif e <= 25:
-                return 1/4.0
+                return 1 / 4.0
             elif e <= 505:
-                return 2/4.0
+                return 2 / 4.0
             elif e <= 905:
-                return 3/4.0
+                return 3 / 4.0
             else:
-                return 4/4.0
+                return 4 / 4.0
 
         subx = 1
         suby = 1
@@ -287,7 +314,7 @@ class Game(object):
         floats = []
 
         def col(e):
-            r, g, b = 1,1,1 #color_for_e(e)
+            r, g, b = 1, 1, 1  # color_for_e(e)
             floats.append(r)
             floats.append(g)
             floats.append(b)
@@ -300,7 +327,6 @@ class Game(object):
             floats.append(x * 0.01)
             floats.append(y * 0.01)
             floats.append(w_for_e(z))
-
 
         for i in range(self.race.w * subx):
             logging.info('{}/{}'.format(i, self.race.w * subx))
@@ -341,10 +367,11 @@ class Game(object):
         sty = 1.0
         floats = []
 
-        maxrw =deeps_scale*(int(self.race.w / deeps_scale) + 2)
-        maxrh = deeps_scale*(int(self.race.h / deeps_scale) + 2)
+        maxrw = deeps_scale * (int(self.race.w / deeps_scale) + 2)
+        maxrh = deeps_scale * (int(self.race.h / deeps_scale) + 2)
         maxr = max(maxrw, maxrh)
         maxr = 1000.0
+
         def tex(a, b):
             floats.append(a)
             floats.append(b)
@@ -352,9 +379,9 @@ class Game(object):
         def vert(x, y, z):
             floats.append(x)
             floats.append(y)
-            r2 = (x*x + y*y)
-            q = min(1000.0, (max(0, (maxr) ** 2 - r2))**0.5)
-            #print('{} {} {} dd={} r2={}'.format(x,y,q,(maxr), r2**0.5))
+            r2 = (x * x + y * y)
+            q = min(1000.0, (max(0, (maxr) ** 2 - r2)) ** 0.5)
+            # print('{} {} {} dd={} r2={}'.format(x,y,q,(maxr), r2**0.5))
             floats.append(-q - 0.5)
 
         ib = -deeps_overhang
@@ -430,33 +457,32 @@ class Game(object):
             logging.error("Model {} not loaded".format(name))
             return
 
-        #glCallList(self.models[name].gl_list)
+        # glCallList(self.models[name].gl_list)
 
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix(GL_MODELVIEW_MATRIX)
-        glTranslate(0,0,0)
-        glRotate(90, 1,0,0)
+        glTranslate(0, 0, 0)
+        glRotate(90, 1, 0, 0)
         pywavefront.visualization.draw(self.models[name])
         glPopMatrix()
 
     def setup_skybox_camera(self):
         self.setup_2d_camera()
         glMatrixMode(GL_MODELVIEW)
-        #eye = - self.player.dir * 30.0 + self.up * 20.0
-        #tgt = self.player.dir * 0.0
-        eye = 3,4,5
-        tgt = 1,1,1
+        # eye = - self.player.dir * 30.0 + self.up * 20.0
+        # tgt = self.player.dir * 0.0
+        eye = 3, 4, 5
+        tgt = 1, 1, 1
         glLoadIdentity()
         gluLookAt(eye[0], eye[1], eye[2],
                   tgt[0], tgt[1], tgt[2],
                   self.up[0], self.up[1], self.up[2])
 
-
     def setup_3d_camera(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
         w, h = list(map(float, list(self.app.get_screen_size())))
-        gluPerspective(90.0, w / h, 1.0, 3000.0* 10)
+        gluPerspective(90.0, w / h, 1.0, 3000.0 * 10)
 
         self.player.dir = make_vector(math.cos(self.player.yaw),
                                       math.sin(self.player.yaw),
@@ -513,7 +539,7 @@ class Game(object):
     def draw_water(self):
 
         glDisable(GL_BLEND)
-        #glColor4f(.9, .0, .0, 1.0)
+        # glColor4f(.9, .0, .0, 1.0)
         glColor4f(.4, .4, .5, 1.0)
         glPushMatrix(GL_MODELVIEW_MATRIX)
         glTranslatef(self.player.pos[0], self.player.pos[1], self.player.pos[2])
@@ -527,18 +553,17 @@ class Game(object):
         self.watervb.draw()
         glDisable(GL_BLEND)
 
-
     def draw(self):
         self.setup_skybox_camera()
 
-        glColor4f(1,1,1,1)
+        glColor4f(1, 1, 1, 1)
 
         self.setup_3d_camera()
 
         glPushMatrix(GL_MODELVIEW_MATRIX)
         glTranslatef(self.player.pos[0], self.player.pos[1], self.player.pos[2])
-        #angle = math.atan2(self.dir[1], self.dir[0])
-        #glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)
+        # angle = math.atan2(self.dir[1], self.dir[0])
+        # glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)
 
         self.skybox.draw()
         glPopMatrix()
@@ -546,19 +571,17 @@ class Game(object):
 
         glEnable(GL_BLEND)
         glDisable(GL_TEXTURE_2D)
-        glColor4f(1.0,1.0,1.0,0.5)
+        glColor4f(1.0, 1.0, 1.0, 0.5)
         glBegin(GL_LINES)
         for b in self.debris:
             b.draw(self)
         glEnd()
-        glColor4f(1.0,1.0,1.0,1.0)
+        glColor4f(1.0, 1.0, 1.0, 1.0)
 
         self.player.draw(self)
 
         for b in self.boats:
             b.draw(self)
-
-
 
         self.tertex.bind()
         self.terrain.draw()
@@ -569,8 +592,6 @@ class Game(object):
         self.physics()
         self.logic()
         self.add_debris()
-
-
 
         self.ticks += 1
         if self.ticks % 100 == 0:
@@ -608,14 +629,14 @@ class Game(object):
     def race_logic(self):
         if self.race.config['type'] == 'checkpoints':
             if self.timer_inc:
-               if self.time_left < 0:
-                   self.losed = True
-                   self.timer_inc = 0
+                if self.time_left < 0:
+                    self.losed = True
+                    self.timer_inc = 0
         elif self.race.config['type'] == 'countdown':
             if self.timer_inc:
-               if self.time_left < 0:
-                   self.losed = True
-                   self.timer_inc = 0
+                if self.time_left < 0:
+                    self.losed = True
+                    self.timer_inc = 0
         elif self.race.config['type'] == 'countup':
             pass
 
@@ -628,7 +649,6 @@ class Game(object):
 
         if self.player.hp <= 0:
             self.losed = True
-
 
         if self.winned or self.losed:
             return
@@ -645,6 +665,7 @@ class Game(object):
             d = cp.pos - self.player.pos
             if vector_len(d) < 30:
                 cp.visited = True
+                cp.pos[2] -= 10.0
                 hit = True
 
         if not self.endpoints:
@@ -686,16 +707,16 @@ class Game(object):
         if self.ticks % 50 == 0:
             for i in range(6):
                 for anomaly in self.race.anomalies:
-                    (x,y,z) = anomaly.pos_for_debris(self.race.sx)
+                    (x, y, z) = anomaly.pos_for_debris(self.race.sx)
                     pos = make_vector(x, y, 0)
-                    if vector_len(pos-self.player.pos) > 1000.0:
+                    if vector_len(pos - self.player.pos) > 1000.0:
                         continue
                     d = Debris()
                     d.pos = pos
-                    d.pos[2] += -0.1*random.randint(1, 100)
+                    d.pos[2] += -0.1 * random.randint(1, 100)
                     d.ttl = 150
                     self.debris.append(d)
-                    if len(self.debris)>50:
+                    if len(self.debris) > 50:
                         return
 
     def debug_currents(self):
@@ -718,10 +739,11 @@ class Game(object):
         glEnd()
 
     def physics(self):
+        self.player.rudder = 0.0
         if self.actions['a']:
-            self.player.yaw += 0.1
+            self.player.rudder += 0.1
         if self.actions['d']:
-            self.player.yaw -= 0.1
+            self.player.rudder += -0.1
         if self.actions['W']:
             self.player.vel += self.player.dir * 0.6
         if self.actions['w']:
@@ -739,22 +761,23 @@ class Game(object):
         if boat.stationary or boat.destroyed:
             return
 
-        for i in range(1,3):
+        for i in range(1, 3):
             if boat.ignore_terrain:
                 continue
             l = 1.0 / max(1.0, vector_len(boat.vel))
             direction = boat.vel * l
 
             newpos = boat.pos + direction * i * 4.0
-            newz = self.race.getfz2((newpos[0] + 0.5*self.race.sx)/self.race.sx,
-                                    (newpos[1] + 0.5*self.race.sy)/self.race.sy)
+            newz = self.race.getfz2((newpos[0] + 0.5 * self.race.sx) / self.race.sx,
+                                    (newpos[1] + 0.5 * self.race.sy) / self.race.sy)
             if newz > 0.0:
-                boat.vel = -0.9 / i  * boat.vel
+                boat.vel = -0.9 / i * boat.vel
 
                 if not boat.quiet:
                     self.app.mus.effect('impact')
                 if boat.destroy_on_impact:
                     boat.destroyed = True
+                    boat.pos[2] -= 5.0
                 boat.hp -= 1
         else:
             boat.pos += boat.vel
@@ -764,8 +787,39 @@ class Game(object):
         current = self.race.get_current(xx, yy)
         # logging.info('current current {}'.format(current))
         boat.vel += current
-        boat.vel *= boat.vel_fade
+
+        side_dir = normalized_vector(make_vector(boat.dir[1], -boat.dir[0], boat.dir[2]))
+        fwd_dir = normalized_vector(boat.dir)
+        fwd_dp = dot_product(fwd_dir, normalized_vector(boat.vel))
+        side_dp = dot_product(side_dir, normalized_vector(boat.vel))
+        fwd_vel = fwd_dp * vector_len(boat.vel)
+        side_vel = side_dp * vector_len(boat.vel)
+
+        yaw_force = boat.rudder * (fwd_vel * 0.1 + 0.03)
+        boat.dyaw += yaw_force
+
+        print ('yf:{}'.format(yaw_force))
+        #if self.ticks% 30 == 0:
+        #    print({'sd': side_dir, 'fd': fwd_dir})
+        #    print({'fp': fwd_dp, 'sp': side_dp})
+        #    print({'fv': fwd_vel, 'sv': side_vel})
+        #    print({'yf': yaw_force})
+
+        # boat.vel *= boat.vel_fade
+        boat.vel -= side_dir * side_vel * 0.05
+        boat.vel -= fwd_dir * fwd_vel * 0.01
+        boat.vel *= 0.9999 # boat.vel_fade
         boat.vel -= current
+
+
+
+        boat.yaw += boat.dyaw
+        boat.pitch += boat.dpitch
+        boat.roll += boat.droll
+
+        boat.dyaw *= 0.2
+        boat.dpitch *= 0.2
+        boat.droll *= 0.2
 
     def onKey(self, key):
         if key == pygame.K_a:
