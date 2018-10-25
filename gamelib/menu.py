@@ -47,17 +47,17 @@ def prepare_menu(app):
         ['Testing lake', 'test.png'],
         ['Butterfly lake', 'lake.png'],
         ['Sunny islands', 'sunny.png'],
-        ['Wind', 'wind.png'],
         ['Currents', 'currents.png'],
-        ['Trading', 'trading.png'],
+        ['Long', 'long.png'],
+        # ['Trading', 'trading.png'],
         ['Rivers', 'rivers.png'],
-        ['Railroad', 'rail.png'],
+        # ['Railroad', 'rail.png'],
         ['Swamps', 'swamps.png'],
         ['Irrigation', 'irrigation.png'],
-        ['Ice', 'ice.png'],
-        ['Exotic', 'exotic.png'],
+        #['Ice', 'ice.png'],
+        #['Exotic', 'exotic.png'],
         ['Rescue', 'rescue.png'],
-        ['Curl', 'curl.png'],
+        #['Curl', 'curl.png'],
     ]
     app.set_race_available('test.png')
     app.set_race_available('lake.png')
