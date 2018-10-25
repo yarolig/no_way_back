@@ -45,7 +45,7 @@ def pargs(func):
 
 
 CELL_SUBDIVIDE = 4
-CELL_SUBDIVIDE_SQUARED = CELL_SUBDIVIDE**2
+CELL_SUBDIVIDE_SQUARED = CELL_SUBDIVIDE ** 2
 CELL_SIDE = 10.0
 VERTEX_COMPONENTS = (3 + 3 + 3)  # (vertices+normal+uvw)
 VERTEX_SIZE = 4 * VERTEX_COMPONENTS  # sizeof(float)
@@ -53,7 +53,7 @@ VERTEX_SIZE = 4 * VERTEX_COMPONENTS  # sizeof(float)
 
 class VertexBuffer(object):
     def __init__(self, size):
-        self.data = [] #np.array(size=size, dtype='float32')
+        self.data = []  # np.array(size=size, dtype='float32')
         self.id = 0
 
     def prepare(self):
@@ -77,9 +77,8 @@ A_BUBBLE_SINK = 5
 A_GEYSER = 5
 
 
-
 class Anomaly(object):
-    def __init__(self, x, y, force = 1.0, range = 10):
+    def __init__(self, x, y, force=1.0, range=10):
         self.x = x
         self.y = y
         self.force = force
@@ -87,15 +86,17 @@ class Anomaly(object):
 
     def pos_for_debris(self, scale):
         a = random.randint(0, 999)
-        r = scale * self.range * 0.8 * (0.001 * random.randint(1, 1000)) # ** 0.5
+        r = scale * self.range * 0.8 * (0.001 * random.randint(1, 1000))  # ** 0.5
         x = r * math.cos(a)
         y = r * math.sin(a)
         z = 0
-        return (self.x*scale + x,
-                self.y*scale + y, z)
+        return (self.x * scale + x,
+                self.y * scale + y, z)
+
 
 class SinkAnomaly(Anomaly):
     value_multiplier = 1.0
+
     def anomaly(self, x, y):
         d = (self.x - x, self.y - y)
         distance = (d[0] ** 2 + d[1] ** 2) ** 0.5
@@ -105,8 +106,8 @@ class SinkAnomaly(Anomaly):
             return (0.0, 0.0)
         direction = (d[0] / distance, d[1] / distance)
         value = self.value_multiplier * self.force
-        return (direction[0]*value - 0.01 * direction[1]*value,
-                direction[1]*value + 0.01 * direction[0]*value)
+        return (direction[0] * value - 0.01 * direction[1] * value,
+                direction[1] * value + 0.01 * direction[0] * value)
 
 
 class SourceAnomaly(SinkAnomaly):
@@ -115,6 +116,7 @@ class SourceAnomaly(SinkAnomaly):
 
 class CurlAnomaly(Anomaly):
     value_multiplier = 1.0
+
     def anomaly(self, x, y):
         d = (self.x - x, self.y - y)
         distance = (d[0] ** 2 + d[1] ** 2) ** 0.5
@@ -124,7 +126,7 @@ class CurlAnomaly(Anomaly):
             return (0.0, 0.0)
         direction = (d[0] / distance, d[1] / distance)
         value = self.value_multiplier * self.force
-        return (-direction[1]*value, direction[0]*value)
+        return (-direction[1] * value, direction[0] * value)
 
 
 class Race(object):
@@ -132,7 +134,7 @@ class Race(object):
         self.vb = None
         self.w = 0
         self.h = 0
-        self.startpos = (0,0)
+        self.startpos = (0, 0)
         self.checkpoints = []
         self.bouys = []
         self.fzcache = None
@@ -152,56 +154,57 @@ class Race(object):
         self.vb.data[idx + 1] = vy
         self.vb.data[idx + 2] = vz
 
-    def small_positive_noise(self,x,y):
+    def small_positive_noise(self, x, y):
         return math.fabs(noise.pnoise3(
-                    float(x) / self.w,
-                    float(y) / self.h,
-                    1.2,
-                    octaves=6, persistence=0.84123, lacunarity=2.41212,
-                    repeatx=1, repeaty=1, repeatz=1,
-                    base=1))
+            float(x) / self.w,
+            float(y) / self.h,
+            1.2,
+            octaves=6, persistence=0.84123, lacunarity=2.41212,
+            repeatx=1, repeaty=1, repeatz=1,
+            base=1))
 
-    def my_noise(self,x,y):
+    def my_noise(self, x, y):
         return noise.pnoise3(
-                    float(x*10) / self.w,
-                    float(y*10) / self.h,
-                    1.2,
-                    octaves=5, persistence=0.54123, lacunarity=2.81212,
-                    repeatx=10, repeaty=10, repeatz=1,
-                    base=4)
-    def getz(self,x,y):
-        z = self.heightmap[int(x)%self.w][int(y)%self.h]
+            float(x * 10) / self.w,
+            float(y * 10) / self.h,
+            1.2,
+            octaves=5, persistence=0.54123, lacunarity=2.81212,
+            repeatx=10, repeaty=10, repeatz=1,
+            base=4)
+
+    def getz(self, x, y):
+        z = self.heightmap[int(x) % self.w][int(y) % self.h]
         return z
 
-    def getfz2(self,x,y):
-        z = self.heightmap[int(x)%self.w][int(y)%self.h]
-        z = self.my_noise(x,y) + z
+    def getfz2(self, x, y):
+        z = self.heightmap[int(x) % self.w][int(y) % self.h]
+        z = self.my_noise(x, y) + z
         return z
 
-    def getfz(self,x,y):
-        z = self.heightmap[int(x)%self.w][int(y)%self.h]
+    def getfz(self, x, y):
+        z = self.heightmap[int(x) % self.w][int(y) % self.h]
         if math.fabs(z) < 5.0:
             return z
 
         if not self.fzcache:
             self.fzcache = {}
-        elem = self.fzcache.get((x,y))
+        elem = self.fzcache.get((x, y))
         if elem:
             return elem
         else:
-            z = self.my_noise(x,y) + z
-            self.fzcache[(x,y)]=z
+            z = self.my_noise(x, y) + z
+            self.fzcache[(x, y)] = z
             return z
 
-    def getz_noised(self,x,y):
-        z = self.heightmap[int(x)%self.w][int(y)%self.h]
-        n = self.noisemap[int(x)%self.w][int(y)%self.h]
+    def getz_noised(self, x, y):
+        z = self.heightmap[int(x) % self.w][int(y) % self.h]
+        n = self.noisemap[int(x) % self.w][int(y) % self.h]
         if z > 0.5:
-            k = 1 #k = z - 1 if z - 1 < 1 else 1
-            z += k*n*self.small_positive_noise(x,y)
+            k = 1  # k = z - 1 if z - 1 < 1 else 1
+            z += k * n * self.small_positive_noise(x, y)
         elif z < 0.5:
             k = 1
-            z += k*-n*self.small_positive_noise(x,y)
+            z += k * -n * self.small_positive_noise(x, y)
         return z
 
     @for_color(pygame.Color(255, 255, 0))
@@ -216,15 +219,15 @@ class Race(object):
 
     @for_color(pygame.Color(255, 0, 0))
     def start(self, x, y):
-        self.heightmap[x][y] = self.heightmap[x-1][y]
+        self.heightmap[x][y] = self.heightmap[x - 1][y]
         self.noisemap[x][y] = 0
-        self.startpos = (x,y)
+        self.startpos = (x, y)
 
     @for_color(pygame.Color(128, 0, 0))
     def checkpoint(self, x, y):
-        self.heightmap[x][y] = self.heightmap[x-1][y]
+        self.heightmap[x][y] = self.heightmap[x - 1][y]
         self.noisemap[x][y] = 0
-        self.checkpoints.append((x,y))
+        self.checkpoints.append((x, y))
 
     @for_color(pygame.Color(0, 0, 0))
     def mountains(self, x, y):
@@ -243,9 +246,9 @@ class Race(object):
 
     @for_color(pygame.Color(255, 128, 0))
     def buoy(self, x, y):
-        self.heightmap[x][y] = self.heightmap[x-1][y]
+        self.heightmap[x][y] = self.heightmap[x - 1][y]
         self.noisemap[x][y] = 0
-        self.bouys.append((x,y))
+        self.bouys.append((x, y))
 
     @for_color(pygame.Color(0, 0, 128))
     def ocean(self, x, y):
@@ -261,7 +264,7 @@ class Race(object):
     def sink(self, x, y):
         self.heightmap[x][y] = -50
         self.noisemap[x][y] = 0
-        a = SinkAnomaly(x,y)
+        a = SinkAnomaly(x, y)
         a.range = 40
         self.anomalies.append(a)
 
@@ -269,7 +272,7 @@ class Race(object):
     def curl(self, x, y):
         self.heightmap[x][y] = -50
         self.noisemap[x][y] = 0
-        a = CurlAnomaly(x,y)
+        a = CurlAnomaly(x, y)
         a.range = 40
         self.anomalies.append(a)
 
@@ -277,29 +280,29 @@ class Race(object):
     def fountain(self, x, y):
         self.heightmap[x][y] = -50
         self.noisemap[x][y] = 0
-        a = SourceAnomaly(x,y)
+        a = SourceAnomaly(x, y)
         a.range = 30
         self.anomalies.append(a)
 
     def noise_heightmap(self):
-        w= self.w
-        h=self.h
-        new_heightmap = np.ndarray(shape=(w,h), dtype=float)
+        w = self.w
+        h = self.h
+        new_heightmap = np.ndarray(shape=(w, h), dtype=float)
         for y in range(h):
             for x in range(w):
 
                 if (math.fabs(self.heightmap[x][y]) <= 1.0
-                  or x == 0 or y == 0
-                  or x == w-1 or y == h - 1):
+                    or x == 0 or y == 0
+                    or x == w - 1 or y == h - 1):
                     new_heightmap[x][y] = self.heightmap[x][y]
                 else:
-                    new_heightmap[x][y] = self.getz_noised(x,y)
+                    new_heightmap[x][y] = self.getz_noised(x, y)
         self.heightmap = new_heightmap
 
     def soften_heightmap(self):
-        w= self.w
-        h=self.h
-        new_heightmap = np.ndarray(shape=(w,h), dtype=float)
+        w = self.w
+        h = self.h
+        new_heightmap = np.ndarray(shape=(w, h), dtype=float)
         dirs = [
             (-1, 0),
             (1, 0),
@@ -317,9 +320,9 @@ class Race(object):
                     new_heightmap[x][y] = self.heightmap[x][y]
                 else:
                     sum = 0.0
-                    for dx,dy in dirs:
-                        sum += self.getz(x+dx, y+dy)
-                    new_heightmap[x][y] = sum/len(dirs)
+                    for dx, dy in dirs:
+                        sum += self.getz(x + dx, y + dy)
+                    new_heightmap[x][y] = sum / len(dirs)
         self.heightmap = new_heightmap
 
     def enum_currents(self, x, y):
@@ -329,11 +332,11 @@ class Race(object):
                 pass
             else:
                 for an in self.anomalies:
-                    yield an.anomaly(x,y)
+                    yield an.anomaly(x, y)
 
     def get_current(self, x, y):
         sum = np.ndarray(shape=(2,), dtype=float)
-        for (x, y) in self.enum_currents(x,y):
+        for (x, y) in self.enum_currents(x, y):
             sum += (x, y)
         result = np.ndarray(shape=(3,), dtype=float)
         result[0] = sum[0]
@@ -352,28 +355,34 @@ class Race(object):
                     self.currents[x][y][1] = 0
                 else:
                     for an in self.anomalies:
-                        self.currents[x][y] += an.anomaly(x,y)
+                        self.currents[x][y] += an.anomaly(x, y)
 
     def save_default_race_conf(self, name):
-        fo = open(name, 'w')
-        fo.write('''
-{
-    "scale_x" : "20.0",
-    "scale_y" : "20.0",
-    "scale_z" : "2.0",
-    "biome"   : "default",
-    "prenoise"   : "1",
-    "smooth"   : "2",
-    "postnoise"   : "1",
+        self.save_race_conf({
+            "scale_x": "20.0",
+            "scale_y": "20.0",
+            "scale_z": "2.0",
+            "biome": "default",
+            "prenoise": "1",
+            "smooth": "2",
+            "postnoise": "1",
+            "next_races": "lake",
+            "intro": "This is a simple race, nothing unusual",
+            "outro": "Race completed!",
+            "time_limit": "99",
 
-    "placeholder1" : "1.0",
-    "placeholder2" : "1.0"
-}
-''')
-        fo.close()
+            "placeholder1": "1.0",
+            "placeholder2": "1.0"
+        }, name)
+
+    def save_race_conf(self, cfg, name):
+        s = json.dumps(cfg, indent=2)
+        f = open(name, 'w')
+        f.write(s)
+        f.close()
 
     def load_race_conf(self, name):
-        #if not os.path.exists(name):
+        # if not os.path.exists(name):
         #    pass
 
         self.save_default_race_conf(name)
@@ -394,9 +403,9 @@ class Race(object):
         self.w = w
         self.h = h
 
-        self.heightmap = np.ndarray(shape=(w,h), dtype=float)
-        self.noisemap = np.ndarray(shape=(w,h), dtype=float)
-        self.currents = np.ndarray(shape=(w,h,2), dtype=float)
+        self.heightmap = np.ndarray(shape=(w, h), dtype=float)
+        self.noisemap = np.ndarray(shape=(w, h), dtype=float)
+        self.currents = np.ndarray(shape=(w, h, 2), dtype=float)
 
         self.vb = VertexBuffer(size=w * h * CELL_SUBDIVIDE_SQUARED * VERTEX_SIZE)
         for y in range(h):

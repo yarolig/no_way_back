@@ -6,6 +6,7 @@ from . import glboilerplate
 
 import pygame
 import time
+import json
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -18,6 +19,7 @@ from .data import *
 from . import controls
 from . import race
 from . import skybox
+from . import gui
 
 
 def make_vector(x=0, y=0, z=0):
@@ -130,19 +132,31 @@ class Debris(Boat):
         glVertex3f(self.path[p0][0], self.path[p0][1], self.path[p0][2])
 
 class Game(object):
+    def init_gui(self):
+        self.frame = gui.Frame(self.app)
+        self.counter = self.frame.add_button("99")
+        self.counter.x = self.app.get_screen_size()[0] / 2 - 10
+        self.hpbar = self.frame.add_volumebox()
+        self.counter.color =  pygame.Color('yellow')
+        self.frame.ypos = self.app.get_screen_size()[1] - 64
+        self.hpbar.color = pygame.Color(40, 170, 190)
+
     def __init__(self, app, racename='race1.png'):
         self.app = app
+        self.racename = racename
+        self.init_gui()
         p = Boat()
         p.pos = make_vector()
         p.dir = make_vector(0, 1, 0)
         self.player = p
         self.boats = []
         self.checkpoints = []
+        self.endpoints = []
         self.debris = []
+        self.winned = False
+        self.losed = False
         self.up = make_vector(0, 0, 1)
         self.models = {}
-
-
 
         #self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
         #self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
@@ -151,8 +165,6 @@ class Game(object):
         self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
         self.models['bouy'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
         self.models['checkpoint'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
-
-
 
         self.clock = pygame.time.Clock()
         self.ticks = 0
@@ -167,7 +179,6 @@ class Game(object):
 
     def prepare_race(self, racename):
         self.tertex = glboilerplate.Texture3D([
-
             filepath('dirt.png'),
             filepath('dirt.png'),
             filepath('sand.png'),
@@ -420,6 +431,9 @@ class Game(object):
         glLoadIdentity()
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
+        w, h = self.app.get_screen_size()
+        gluOrtho2D(0, w, 0, h)
+
         glDisable(GL_DEPTH_TEST)
         glDisable(GL_BLEND)
 
@@ -470,7 +484,6 @@ class Game(object):
 
 
     def draw(self):
-        self.clock.tick()
         self.setup_skybox_camera()
 
         glColor4f(1,1,1,1)
@@ -519,11 +532,20 @@ class Game(object):
             pygame.display.set_caption("pyweek26: No Way Back FPS:{}".format(self.clock.get_fps()))
 
         self.setup_2d_camera()
+        self.frame.draw()
+
+        if False:
+            self.clock.tick(60)
+        else:
+            self.clock.tick_busy_loop(60)
 
     def logic(self):
+        if self.winned or self.losed:
+            return
+
         win = True
         hit = False
-        if not self.checkpoints:
+        if not self.checkpoints and not self.endpoints:
             return
 
         for cp in self.checkpoints:
@@ -535,7 +557,17 @@ class Game(object):
                 cp.visited = True
                 hit = True
 
+        if not self.endpoints:
+            pass
+        else:
+            for cp in self.endpoints:
+                d = cp.pos - self.player.pos
+                if vector_len(d) < 30:
+                    break
+            else:
+                win = False
         if win:
+            self.on_win()
             self.app.mus.effect('win')
             self.app.mus.onLevelEnd()
             for cp in self.checkpoints:
@@ -543,12 +575,17 @@ class Game(object):
         elif hit:
             self.app.mus.effect('checkpoint')
 
+    def on_win(self):
+        self.winned = True
+        for racename in self.race.config['next_races'].split():
+            self.app.set_race_available(racename)
+
     def add_debris(self):
         self.debris = [x for x in self.debris if x.ttl > 0]
         for d in self.debris:
             d.ttl -= 1
 
-        if self.ticks % 10 == 0:
+        if self.ticks % 25 == 0:
             for anomaly in self.race.anomalies:
                 for i in range(3):
                     (x,y,z) = anomaly.pos_for_debris(self.race.sx)
@@ -558,7 +595,7 @@ class Game(object):
                     d = Debris()
                     d.pos = pos
                     d.pos[2] += -0.1*random.randint(1, 100)
-                    d.ttl = 200
+                    d.ttl = 150
                     self.debris.append(d)
         '''
         dside = 2

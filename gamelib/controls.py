@@ -20,6 +20,10 @@ def make_actions():
     actions['c'] = False
     actions['anchor'] = False
     actions['enter'] = False
+
+    actions['mus+'] = False
+    actions['mus-'] = False
+    actions['mus_toggle'] = False
     return actions
 
 
@@ -46,6 +50,13 @@ class Controls(object):
 
         self.key_to_action[pygame.K_SPACE] = 'anchor'
         self.key_to_action[pygame.K_RETURN] = 'enter'
+
+        self.key_to_action[pygame.K_PLUS] = 'mus+'
+        self.key_to_action[pygame.K_KP_PLUS] = 'mus+'
+        self.key_to_action[pygame.K_EQUALS] = 'mus+'
+        self.key_to_action[pygame.K_MINUS] = 'mus-'
+        self.key_to_action[pygame.K_KP_MINUS] = 'mus-'
+        self.key_to_action[pygame.K_m] = 'mus_toggle'
 
     def onKey(self, key, isdown, actions):
         action = self.key_to_action.get(key, None)

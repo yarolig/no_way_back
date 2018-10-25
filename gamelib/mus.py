@@ -16,10 +16,7 @@ class Mus(object):
         self.app = app
         self.music = None
         self.tracks = []
-#        pygame.mixer.init()
-
         self.sounds = {}
-
 
         t = Track()
         t.file = 'Podington_Bear_-_11_-_Massive_Attack.ogg'
@@ -38,27 +35,53 @@ class Mus(object):
         t.file = 'how_the_night_came_-_06_-_6_Pris.ogg'
         t.ls_time = 99.2
         self.tracks.append(t)
-        self.start_second_time = False
 
-        self.current_track = t # random.choice(self.tracks)
+        self.start_second_time = False
+        self.current_track = random.choice(self.tracks)
 
     def init(self):
         pass
 
-    def onStart(self):
-        music_file = data.musicpath(self.current_track.file)
-        logging.debug("music file: {}".format(music_file))
+    def create_music(self):
         self.music = pygame.mixer.music
-        self.music.load(music_file)
-        self.music.play(loops=0)
         self.music.set_endevent(pygame.USEREVENT)
+
+    def destroy_music(self):
+        if self.music is None:
+            return
+
+    def onMusicVolumeChanged(self):
+        if self.music:
+            self.music.set_volume(float(self.app.config['MusicVolume']))
+
+    def onMusicToggle(self):
+        if self.app.config['Music'] == '1':
+            self.create_music()
+        else:
+            if self.music:
+                self.music.fadeout(100)
+            self.music = None
+        self.change_music()
+
+    def onStart(self):
+        if self.app.config['Music'] == '1':
+            self.create_music()
+
+            music_file = data.musicpath(self.current_track.file)
+            logging.debug("music file: {}".format(music_file))
+            self.music = pygame.mixer.music
+            self.music.load(music_file)
+            self.music.set_volume(float(self.app.config['MusicVolume']))
+            self.music.play(loops=0)
 
         self.sounds['impact'] = pygame.mixer.Sound(data.musicpath('274943__theshaggyfreak__knock-knock1.ogg'))
         self.sounds['checkpoint'] = pygame.mixer.Sound(data.musicpath('332629__treasuresounds__item-pickup.ogg'))
         self.sounds['win'] = pygame.mixer.Sound(data.musicpath('147256__pjcohen__skiba22edge.ogg'))
 
-
     def onLevelStart(self, level):
+        if self.music is None:
+            return
+
         if self.start_second_time:
             self.change_music()
         else:
@@ -85,11 +108,12 @@ class Mus(object):
     def onLevelEnd(self):
         pass
 
-
     def onExit(self):
         if self.music:
              self.music.fadeout(500)
-             time.sleep(0.5)
              self.music = None
+
     def effect(self,name):
-        self.sounds[name].play()
+        if self.app.config['Sound'] == '1':
+            self.sounds[name].set_volume(float(self.app.config['SoundVolume']))
+            self.sounds[name].play()

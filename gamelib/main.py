@@ -32,6 +32,7 @@ class App(object):
         return (self.w, self.h)
 
     def select_menu(self, new_menu):
+        print("select menu {}".format(new_menu))
         self.active_menu = new_menu
 
     def start_game(self, race):
@@ -43,11 +44,37 @@ class App(object):
         self.mus.onLevelStart(race)
         self.active_menu = None
 
+    def is_race_completed(self, name):
+        return self.config.get('completed_' + name, False)
+
+    def set_race_completed(self, name):
+        self.config['completed_' + name] = True
+        self.save_config()
+
+    def is_race_available(self, name):
+        return self.config.get('available_' + name, False)
+
+    def set_race_available(self, name):
+        self.config['available_' + name] = True
+        self.save_config()
+
+    def continue_game(self):
+        if not self.game:
+            return
+        self.active_menu = None
+
+    def load_config(self):
+        self.config = load_config()
+
+    def save_config(self):
+        save_config(self.config)
+
+
     def init(self):
         self.active_menu = None
         self.mus = Mus(self)
 
-        self.config = load_config()
+        self.load_config()
 
         self.w, self.h = list(map(int,
                                   self.config['Resolution'].split('x')))
@@ -125,12 +152,12 @@ class App(object):
                     self.mus.onExit()
                     return
                 if e.type == pygame.KEYUP:
-                    if e.key == pygame.K_q:
+                    if e.key == pygame.K_F10:
                         self.exit()
 
                     if self.game:
                         if e.key == pygame.K_ESCAPE:
-                            self.select_menu(self.new_menu)
+                            self.select_menu(self.main_menu)
                         else:
                             self.controls.onKey(e.key, False, self.game.actions)
                 if e.type == pygame.KEYDOWN:
