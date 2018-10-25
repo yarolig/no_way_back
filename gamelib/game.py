@@ -413,12 +413,13 @@ class Game(object):
         self.deepsvb.prepare()
 
     def prepare_water(self):
+        self.water_tex = glboilerplate.Texture(filepath('water.png'))
         water_scale = 5.0
         water_overhang = 15
         sx = self.race.sx * water_scale
         sy = self.race.sx * water_scale
-        stx = 1.0
-        sty = 1.0
+        stx = 10.0
+        sty = 10.0
         floats = []
 
         def tex(a, b):
@@ -432,20 +433,20 @@ class Game(object):
 
         for i in range(-water_overhang, int(self.race.w / water_scale) + water_overhang):
             for j in range(-water_overhang, int(self.race.h / water_scale) + water_overhang):
-                vert((i) * sx, (j) * sy, 0.0)
-                tex((i) * stx, (j) * sty)
+                vert((i) * sx,  (j) * sy, 0.0)
+                tex( (i) * stx, (j) * sty)
 
-                vert((i + 1) * sx, (j) * sy, 0.0)
-                tex((i + 1) * stx, (j) * sty)
+                vert((i + 1) * sx,  (j) * sy, 0.0)
+                tex( (i + 1) * stx, (j) * sty)
 
-                vert((i + 1) * sx, (j + 1) * sy, 0.0)
-                tex((i + 1) * stx, (j) * sty)
+                vert((i + 1) * sx,  (j + 1) * sy, 0.0)
+                tex( (i + 1) * stx, (j + 1) * sty)
 
-                vert((i) * sx, (j + 1) * sy, 0.0)
-                tex((i) * stx, (j + 1) * sty)
+                vert((i) * sx,  (j + 1) * sy, 0.0)
+                tex( (i) * stx, (j + 1) * sty)
         self.watervb = glboilerplate.VertexBuffer(
             floats,
-            uv_offset=8, uv_size=2,
+            uv_offset=3*4, uv_size=2,
             vertex_offset=0,
             mode=GL_QUADS
         )
@@ -548,9 +549,12 @@ class Game(object):
         glPopMatrix()
 
         glEnable(GL_BLEND)
-        glColor4f(0.0, 0.07, 0.3, 0.5)
+        #glDisable(GL_BLEND)
+        glColor4f(1.0, 1.0, 1.0, 0.5)
         glNormal3f(0.0, 0.0, 1.0)
+        self.water_tex.bind()
         self.watervb.draw()
+        self.water_tex.unbind()
         glDisable(GL_BLEND)
 
     def draw(self):
