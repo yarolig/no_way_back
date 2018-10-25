@@ -58,6 +58,23 @@ class App(object):
         self.config['available_' + name] = True
         self.save_config()
 
+    def set_race_mintime(self, name, t):
+        oldt = int(self.config.get('mintime_' + name, 99999))
+        self.config['mintime_' + name] = str(min(oldt, t))
+        self.save_config()
+
+    def set_race_maxtime(self, name, t):
+        oldt = int(self.config.get('maxtime_' + name, 0))
+        self.config['maxtime_' + name] = str(min(oldt, t))
+        self.save_config()
+
+    def get_race_record(self, name):
+        return str(int(self.config.get('maxtime_' + name, 0))
+                or int(self.config.get('mintime_' + name, 0))
+                or "")
+
+
+
     def continue_game(self):
         if not self.game:
             return

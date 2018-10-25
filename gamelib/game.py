@@ -668,6 +668,13 @@ class Game(object):
 
     def on_win(self):
         self.winned = True
+        if self.race.config['type'] == 'checkpoints':
+            self.app.set_race_maxtime(self.racename, self.time_left)
+        elif self.race.config['type'] == 'countdown':
+            self.app.set_race_maxtime(self.racename, self.time_left)
+        elif self.race.config['type'] == 'countup':
+            self.app.set_race_mintime(self.racename, self.time_left)
+
         for racename in self.race.config['next_races'].split():
             self.app.set_race_available(racename)
 

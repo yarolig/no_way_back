@@ -33,7 +33,7 @@ def prepare_menu(app):
     app.main_menu = f
 
     f = Frame(app)
-    f.ypos += 80
+    f.ypos += 20
     f.pxsize = 32
     #f.add_button("Easy", action=ss('easy'))
     #f.add_button("Normal", action=ss('normal'))
@@ -42,23 +42,34 @@ def prepare_menu(app):
     #f.add_button("Impossible", action=ss('impossible'))
     #f.add_button("")
 
-    f.add_button("Testing lake", action=ss('test.png'))
 
+    races = [
+        ['Testing lake', 'test.png'],
+        ['Butterfly lake', 'lake.png'],
+        ['Sunny islands', 'sunny.png'],
+        ['Wind', 'wind.png'],
+        ['Currents', 'currents.png'],
+        ['Trading', 'trading.png'],
+        ['Rivers', 'rivers.png'],
+        ['Railroad', 'rail.png'],
+        ['Swamps', 'swamps.png'],
+        ['Irrigation', 'irrigation.png'],
+        ['Ice', 'ice.png'],
+        ['Exotic', 'exotic.png'],
+        ['Rescue', 'rescue.png'],
+        ['Curl', 'curl.png'],
+    ]
+    app.set_race_available('test.png')
+    app.set_race_available('lake.png')
+    for name, fn in races:
+        b = f.add_button(name, action=ss(fn))
+        if not app.is_race_available(fn):
+            # b.disabled = True
+            b.color = pygame.Color('black')
+        t = app.get_race_record(fn)
+        b.text += " " + t
 
-    f.add_button("Butterfly lake", action=ss('lake.png'))
-    f.add_button("Sunny islands", action=ss('sunny.png'))
-    f.add_button("Wind", action=ss('wind.png'))
-    f.add_button("Currents", action=ss('currents.png'))
-    #f.add_button("Trading", action=ss('trading.png'))
-    #f.add_button("Rivers", action=ss('rivers.png'))
-    f.add_button("Railroad", action=ss('rail.png'))
-    #f.add_button("Swamps", action=ss('swamps.png'))
-    f.add_button("Irrigation", action=ss('irrigation.png'))
-    #f.add_button("Ice", action=ss('ice.png'))
-    #f.add_button("Exotic", action=ss('exotic.png'))
-    #f.add_button("Rescue", action=ss('rescue.png'))
-    #f.add_button("Curl", action=ss('curl.png'))
-
+    f.add_button("")
     f.add_button("Back", action=lambda: app.select_menu(app.main_menu))
     app.new_menu = f
 

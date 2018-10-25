@@ -386,7 +386,7 @@ class Race(object):
 
             "start_time": "30",
             "cp_time": "15",
-            "type" : 'checkpoints',
+            "type" : 'countup',  #"type" : 'checkpoints'
 
             "placeholder1": "1.0",
             "placeholder2": "1.0"
