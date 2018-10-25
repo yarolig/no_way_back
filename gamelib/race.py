@@ -51,23 +51,6 @@ VERTEX_COMPONENTS = (3 + 3 + 3)  # (vertices+normal+uvw)
 VERTEX_SIZE = 4 * VERTEX_COMPONENTS  # sizeof(float)
 
 
-class VertexBuffer(object):
-    def __init__(self, size):
-        self.data = []  # np.array(size=size, dtype='float32')
-        self.id = 0
-
-    def prepare(self):
-        self.id = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.id)
-        glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW)
-
-    def draw(self):
-        pass
-
-    def destroy(self):
-        glDeleteBuffers(1, self.id)
-
-
 A_SINK = 1
 A_SOURCE = 2
 A_CURL = 3
@@ -78,7 +61,7 @@ A_GEYSER = 5
 
 
 class Anomaly(object):
-    def __init__(self, x, y, force=0.0, range=10):
+    def __init__(self, x, y, force=0.1, range=10):
         self.x = x
         self.y = y
         self.force = force
@@ -146,20 +129,6 @@ class Race(object):
         self.boats = []
         self.fzcache = None
         self.anomalies = []
-
-    def vbset(self, x, y, n, vz, vx=None, vy=None, normal=None, tex=None):
-        assert 0 <= n < CELL_SUBDIVIDE ** 2
-        assert 0 <= x <= self.w
-        assert 0 <= y <= self.h
-        if vx is None or vy is None:
-            nx = n % CELL_SUBDIVIDE
-            ny = n // CELL_SUBDIVIDE
-            vx = x * CELL_SIDE + float(nx) / (CELL_SUBDIVIDE - 1) * CELL_SIDE
-            vy = y * CELL_SIDE + float(ny) / (CELL_SUBDIVIDE - 1) * CELL_SIDE
-        idx = ((x + y * self.w) * CELL_SUBDIVIDE + n) * VERTEX_COMPONENTS
-        self.vb.data[idx + 0] = vx
-        self.vb.data[idx + 1] = vy
-        self.vb.data[idx + 2] = vz
 
     def small_positive_noise(self, x, y):
         return math.fabs(noise.pnoise3(
@@ -443,7 +412,6 @@ class Race(object):
         self.noisemap = np.ndarray(shape=(w, h), dtype=float)
         self.currents = np.ndarray(shape=(w, h, 2), dtype=float)
 
-        self.vb = VertexBuffer(size=w * h * CELL_SUBDIVIDE_SQUARED * VERTEX_SIZE)
         for y in range(h):
             for x in range(w):
                 c = hc(img.get_at((x, h - y - 1)))
@@ -454,7 +422,7 @@ class Race(object):
                     color_actions[c] = lambda s, x, y: None
                     logging.warn('Please add @for_color(pygame.Color{})'.format(c))
         logging.info('calculating currents')
-        self.calc_currents()
+        #self.calc_currents()
 
         for i in range(self.prenoise):
             logging.info('noising')
