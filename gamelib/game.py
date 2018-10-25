@@ -51,6 +51,7 @@ class Boat(object):
     hp = 10
     maxhp = 10
     destroy_on_impact = False
+    ignore_terrain = False
     destroyed = False
     quiet = False
 
@@ -91,6 +92,7 @@ class Debris(Boat):
     vel_fade = 0.1
     ttl = 500
     destroy_on_impact = True
+    ignore_terrain = True
     quiet = True
     path = None
 
@@ -189,9 +191,12 @@ class Game(object):
         #self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
         #self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
 
-        self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
-        self.models['bouy'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
+        #self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
+
+        self.models['boat'] = pywavefront.Wavefront(filepath('motorboat.obj'))
+        self.models['bouy'] = pywavefront.Wavefront(filepath('bouy.obj'))
         self.models['checkpoint'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
+        self.models['endpoint'] = pywavefront.Wavefront(filepath('endpoint.obj'))
 
         self.clock = pygame.time.Clock()
         self.ticks = 0
@@ -671,9 +676,9 @@ class Game(object):
         for d in self.debris:
             d.ttl -= 1
 
-        if self.ticks % 25 == 0:
-            for anomaly in self.race.anomalies:
-                for i in range(3):
+        if self.ticks % 50 == 0:
+            for i in range(6):
+                for anomaly in self.race.anomalies:
                     (x,y,z) = anomaly.pos_for_debris(self.race.sx)
                     pos = make_vector(x, y, 0)
                     if vector_len(pos-self.player.pos) > 1000.0:
@@ -683,28 +688,8 @@ class Game(object):
                     d.pos[2] += -0.1*random.randint(1, 100)
                     d.ttl = 150
                     self.debris.append(d)
-        '''
-        dside = 2
-        ds = 200.0
-        djitter = 1.0;
-        if self.ticks % 75 == 0:
-            for i in range(-dside, dside):
-                for j in range(-dside, dside):
-                    if i == 0 and j == 0:
-                        continue
-                    # add debris
-                    d = Debris()
-                    d.pos = self.player.pos + (ds*i-0.1*random.randint(-1000, 1000),
-                                               ds*j-0.1*random.randint(-1000, 1000),
-                                               -0.1*random.randint(1, 100))
-                    d.ttl = 75
-                    # xx = int(d.pos[0]/self.race.sx)
-                    # yy = int(d.pos[1]/self.race.sy)
-                    # current = self.race.get_current(xx, yy)
-                    # d.vel[0] = current[0]
-                    # d.vel[1] = current[1]
-                    self.debris.append(d)
-        '''
+                    if len(self.debris)>50:
+                        return
 
     def debug_currents(self):
         boat = self.player
@@ -747,8 +732,9 @@ class Game(object):
         if boat.stationary or boat.destroyed:
             return
 
-
         for i in range(1,3):
+            if boat.ignore_terrain:
+                continue
             l = 1.0 / max(1.0, vector_len(boat.vel))
             direction = boat.vel * l
 
