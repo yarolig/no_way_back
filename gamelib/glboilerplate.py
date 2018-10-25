@@ -43,9 +43,10 @@ class Texture3D(object):
 
         h, w = 0, 0
         ph, pw = 0, 0
-        data = ''
+        data = None
         for s in surfaces:
-            data += pygame.image.tostring(s, 'RGBA', True)
+            d = pygame.image.tostring(s, 'RGBA', True)
+            data = d if not data else data + d
             w, h = s.get_size()
             if ph:
                 assert ph == h and pw == w

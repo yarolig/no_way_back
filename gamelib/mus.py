@@ -95,7 +95,7 @@ class Mus(object):
     def change_music(self):
         if self.music is None:
             return
-        for i in xrange(10):
+        for i in range(10):
             t = random.choice(self.tracks)
             if t is not self.current_track:
                 self.current_track = t

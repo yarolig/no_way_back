@@ -442,15 +442,15 @@ class Race(object):
         logging.info('calculating currents')
         self.calc_currents()
 
-        for i in xrange(self.prenoise):
+        for i in range(self.prenoise):
             logging.info('noising')
             self.noise_heightmap()
 
-        for i in xrange(self.smooth):
+        for i in range(self.smooth):
             logging.info('bluring')
             self.soften_heightmap()
 
-        for i in xrange(self.postnoise):
+        for i in range(self.postnoise):
             logging.info('noising')
             self.noise_heightmap()
 
