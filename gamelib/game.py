@@ -184,7 +184,6 @@ class Game(object):
         self.hpbar.color = pygame.Color(40, 100, 130)
 
     def update_hpbar(self):
-        
         self.hpbar.color = pygame.Color(40, 100, 130)
         if self.player.shield_ttl > 0:
             self.hpbar.color = pygame.Color(150, 210, 250)
@@ -193,7 +192,6 @@ class Game(object):
         self.hpbar.maxvalue = self.player.maxhp
 
     def update_counter(self):
-
         if self.winned:
             self.counter.text = "Win!"
         elif self.losed:
@@ -202,10 +200,13 @@ class Game(object):
         else:
             if self.timer_inc:
                 self.counter.text = "{}".format(self.time_left)
+                if self.laps > 1:
+                    self.counter.text += (" {}/{}".format(self.current_lap, self.laps))
+                  
             else:
                 self.counter.text = "--"
-
-    def __init__(self, app, racename='race1.png'):
+            
+    def __init__(self, app, racename='race1.png', race_type=None, laps=0):
         self.app = app
         self.racename = racename
         self.init_gui()
@@ -219,6 +220,8 @@ class Game(object):
         self.debris = []
         self.winned = False
         self.losed = False
+        self.current_lap = 0
+        self.laps = laps
         self.up = make_vector(0, 0, 1)
         self.models = {}
         self.time_left = 0
@@ -237,6 +240,10 @@ class Game(object):
         self.actions = controls.make_actions()
 
         self.prepare_race(racename)
+        if race_type:
+          self.race_type = race_type
+        if not self.laps:
+          self.laps = int(self.race.config.get('laps', 1))
         self.init_race_logic()
         self.prepare_water()
         self.prepare_deeps()
@@ -260,6 +267,7 @@ class Game(object):
         self.player.pos = make_vector(sx * self.race.startpos[0],
                                       sy * self.race.startpos[1])
         self.player.yaw = 270
+        self.race_type = self.race.config['type']
 
         for x, y in self.race.bouys:
             b = Bouy()
@@ -625,42 +633,56 @@ class Game(object):
             self.clock.tick_busy_loop(60)
 
     def init_race_logic(self):
-        if self.race.config['type'] == 'checkpoints':
+        print (['Gametype', self.race_type])
+        if self.race_type == 'checkpoints':
             self.time_left = int(self.race.config['start_time'])
-        elif self.race.config['type'] == 'countdown':
+            self.timer_inc = -1 ###
+        elif self.race_type == 'countdown':
             self.time_left = int(self.race.config['start_time'])
             self.timer_inc = -1
-        elif self.race.config['type'] == 'countup':
+        elif self.race_type == 'countup':
             self.time_left = 0
             self.timer_inc = 1
+        elif self.race_type == 'circuit':
+            self.time_left = int(self.race.config['start_time'])
+            self.timer_inc = -1
 
     def checkpoint_hitted(self):
-        if self.race.config['type'] == 'checkpoints':
+        if self.race_type == 'checkpoints':
             if not self.timer_inc:
                 self.timer_inc = -1
                 self.time_left = int(self.race.config['start_time'])
             self.time_left += int(self.race.config['cp_time'])
-        elif self.race.config['type'] == 'countdown':
+        elif self.race_type == 'countdown':
             pass
-        elif self.race.config['type'] == 'countup':
+        elif self.race_type == 'countup':
             pass
+        elif self.race_type == 'circuit':
+            if not self.timer_inc:
+                self.timer_inc = -1
+                self.time_left = int(self.race.config['start_time'])
+            self.time_left += int(self.race.config['cp_time'])
 
     def race_logic(self):
-        if self.race.config['type'] == 'checkpoints':
+        if self.race_type == 'checkpoints':
             if self.timer_inc:
                 if self.time_left < 0:
                     self.losed = True
                     self.timer_inc = 0
-        elif self.race.config['type'] == 'countdown':
+        elif self.race_type == 'countdown':
             if self.timer_inc:
                 if self.time_left < 0:
                     self.losed = True
                     self.timer_inc = 0
-        elif self.race.config['type'] == 'countup':
+        elif self.race_type == 'countup':
             pass
+        elif self.race_type == 'circuit':
+            if self.timer_inc:
+                if self.time_left < 0:
+                    self.losed = True
+                    self.timer_inc = 0
 
     def logic(self):
-        
         self.update_hpbar()
         if self.ticks % 50 == 0:
             self.race_logic()
@@ -702,6 +724,14 @@ class Game(object):
                     break
             else:
                 win = False
+        if win and self.laps > 1:
+            self.current_lap += 1
+            if self.current_lap < self.laps:
+                win = False
+                self.app.mus.effect('checkpoint')
+                for cp in self.checkpoints:
+                    cp.visited = False
+                    cp.pos[2] += 10.0
         if win:
             self.on_win()
             self.app.mus.effect('win')
@@ -715,13 +745,16 @@ class Game(object):
 
     def on_win(self):
         self.winned = True
-        if self.race.config['type'] == 'checkpoints':
+        if self.race_type == 'checkpoints':
             self.app.set_race_maxtime(self.racename, self.time_left)
-        elif self.race.config['type'] == 'countdown':
+        elif self.race_type == 'countdown' and self.time_left > 0:
             self.app.set_race_maxtime(self.racename, self.time_left)
-        elif self.race.config['type'] == 'countup':
+        elif self.race_type == 'countup':
             self.app.set_race_mintime(self.racename, self.time_left)
+        elif self.race_type == 'circuit':
+            self.app.set_race_maxtime(self.racename, self.time_left)
 
+        self.app.set_race_completed(self.racename)
         for racename in self.race.config['next_races'].split():
             self.app.set_race_available(racename)
 

@@ -23,9 +23,10 @@ def update_game_menu(app, f):
   # Update records
   for name, fn, b, req in f.named_buttons:
     t = app.get_race_record(fn)
-    if t:
+    c = app.is_race_completed(fn)
+    if t or c:
       played_races[fn] = 1
-      b.text = name + " " + t
+      b.text = name + " " + (t or "Done")
       
   # Fill availability
   print(['pr:', played_races])
@@ -52,6 +53,7 @@ def update_game_menu(app, f):
       
 def prepare_menu(app):
     app.new_menu = None
+    app.custom_races_menu = None
     app.save_menu = None
     app.load_menu = None
     app.main_menu = None
@@ -68,11 +70,18 @@ def prepare_menu(app):
             app.start_game(d)
         return sg
 
+    def sc(d, rt, laps=0):
+        def sg():
+            app.main_menu.continue_button.disabled = False
+            app.start_custom_race(d, rt, laps)
+        return sg
+
     f = Frame(app)
     f.ypos += 100
     f.continue_button = f.add_button("Continue", action=app.continue_game)
     f.continue_button.disabled = True
     f.add_button("Start Race", action=lambda: app.select_menu(app.new_menu))
+    f.add_button("Custom Races", action=lambda: app.select_menu(app.custom_races_menu))
     f.add_button("Options", action=lambda: app.select_menu(app.options_menu))
     f.add_button("Exit", action=app.exit)
     app.main_menu = f
@@ -99,7 +108,8 @@ def prepare_menu(app):
         
         # optional
         ['Longer', 'longer.png', 'long.png'],                 # 
-        ['Irrigation2', 'irrigation2.png', 'irrigation.png'], #
+        ['Irrigation2', 'irrigation2.png', 'irrigation.png'], # 
+        ['Rivers2', 'rivers2.png', 'irrigation.png'], #
         ['Testing lake', 'test.png', ''],
     ]
     app.set_race_available('test.png')
@@ -222,3 +232,10 @@ def prepare_menu(app):
     app.difficulty_menu.add_button("")
     app.difficulty_menu.add_button("Back", action=lambda: app.select_menu(app.options_menu))
 
+
+    f = Frame(app)
+    f.ypos += 100
+    # f.add_button("Graphics",action=lambda:app.select_menu(app.sound_menu))
+    f.add_button("Lake circuit", action=sc('lake.png', 'circuit', laps=3))
+    f.add_button("Back", action=lambda: app.select_menu(app.main_menu))
+    app.custom_races_menu = f

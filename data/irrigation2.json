@@ -1,0 +1,18 @@
+{
+  "biome": "default", 
+  "postnoise": "1", 
+  "placeholder1": "1.0", 
+  "start_time": "30", 
+  "smooth": "2", 
+  "next_races": "lake", 
+  "outro": "Race completed!", 
+  "intro": "This is a simple race, nothing unusual", 
+  "scale_x": "20.0", 
+  "scale_y": "20.0", 
+  "scale_z": "2.0", 
+  "placeholder2": "1.0", 
+  "type": "circuit", 
+  "laps": "3", 
+  "cp_time": "10", 
+  "prenoise": "1"
+}

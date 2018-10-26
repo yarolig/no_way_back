@@ -1,0 +1,17 @@
+{
+  "postnoise": "1",
+  "placeholder2": "1.0",
+  "type": "countup",
+  "biome": "default",
+  "intro": "This is a simple race, nothing unusual",
+  "scale_y": "20.0",
+  "placeholder1": "1.0",
+  "next_races": "lake",
+  "prenoise": "1",
+  "start_time": "30",
+  "scale_z": "2.0",
+  "scale_x": "20.0",
+  "cp_time": "15",
+  "outro": "Race completed!",
+  "smooth": "2"
+}

@@ -45,8 +45,8 @@ reliability of new boat.
 
 Let's show them its speed in open sea.
 
-As you can guess the floating spheres indicate the route
-or enclose dangerous areas.
+As you can guess the floating spheres indicate
+the route or enclose dangerous areas.
 """,
 
 'currents.png' : """
@@ -118,6 +118,10 @@ A bit longer distance.
 """,
 'irrigation2.png' : """
 Sandland boat racing contest was cool!
+They prepared a new one.
+""",
+'rivers2.png' : """
+Riverland boat racing contest was cool!
 They prepared a new one.
 """,
 

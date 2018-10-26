@@ -1,0 +1,18 @@
+{
+  "smooth": "2",
+  "scale_x": "20.0",
+  "scale_y": "20.0",
+  "outro": "Race completed!",
+  "start_time": "40",
+  "scale_z": "2.0",
+  "type": "circuit",
+  "laps": "3",
+  "cp_time": "30",
+  "postnoise": "1",
+  "prenoise": "1",
+  "placeholder2": "1.0",
+  "placeholder1": "1.0",
+  "biome": "default",
+  "intro": "This is a simple race, nothing unusual",
+  "next_races": "lake"
+}

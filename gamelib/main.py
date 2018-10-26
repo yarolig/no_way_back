@@ -35,6 +35,17 @@ class App(object):
         print("select menu {}".format(new_menu))
         self.active_menu = new_menu
 
+
+    def start_custom_race(self, race, rt, laps=0):
+        make_loading_menu(self)
+        self.select_menu(self.loading_menu)
+        pygame.event.pump()
+        self.draw()
+        pygame.event.pump()
+        self.game = Game(self, race, rt, laps)
+        self.active_menu = None
+        self.mus.onLevelStart(race)
+
     def start_game(self, race):
         text = quests.intro_for_level(race)
         if text:
@@ -108,7 +119,7 @@ class App(object):
 
         self.w, self.h = list(map(int,
                                   self.config['Resolution'].split('x')))
-        logging.basicConfig(level=logging.DEBUG)
+        #logging.basicConfig(level=logging.DEBUG)
 
         logging.debug("mixer pre-init")
         pygame.mixer.pre_init()

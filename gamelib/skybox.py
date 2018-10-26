@@ -49,7 +49,6 @@ class Skybox(object):
                 vertex(a,b)
                 vertex(a,b+1)
                 vertex(a+1,b+1)
-        print(self.floats)
         self.vb = glboilerplate.VertexBuffer(
             self.floats,
             vertex_size=3, vertex_offset=0,

@@ -369,6 +369,7 @@ class Race(object):
 
             "start_time": "30",
             "cp_time": "15",
+            "laps": "1",
             "type" : 'countup',  #"type" : 'checkpoints'
 
             "placeholder1": "1.0",
@@ -382,10 +383,8 @@ class Race(object):
         f.close()
 
     def load_race_conf(self, name):
-        # if not os.path.exists(name):
-        #    pass
-
-        self.save_default_race_conf(name)
+        if not os.path.exists(name):
+            self.save_default_race_conf(name)
 
         f = json.load(open(name))
         self.config = f
