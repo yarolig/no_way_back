@@ -84,7 +84,7 @@ class Boat(object):
         self.vel = make_vector(0, 0, 0)
 
     def draw(self, game):
-        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glPushMatrix()
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
         angle = math.atan2(self.dir[1], self.dir[0])
         glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)
@@ -461,7 +461,7 @@ class Game(object):
         # glCallList(self.models[name].gl_list)
 
         glMatrixMode(GL_MODELVIEW)
-        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glPushMatrix()
         glTranslate(0, 0, 0)
         glRotate(90, 1, 0, 0)
         pywavefront.visualization.draw(self.models[name])
@@ -542,7 +542,7 @@ class Game(object):
         glDisable(GL_BLEND)
         # glColor4f(.9, .0, .0, 1.0)
         glColor4f(.4, .4, .5, 1.0)
-        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glPushMatrix()
         glTranslatef(self.player.pos[0], self.player.pos[1], self.player.pos[2])
         self.deepsvb.draw()
 
@@ -564,7 +564,7 @@ class Game(object):
 
         self.setup_3d_camera()
 
-        glPushMatrix(GL_MODELVIEW_MATRIX)
+        glPushMatrix()
         glTranslatef(self.player.pos[0], self.player.pos[1], self.player.pos[2])
         # angle = math.atan2(self.dir[1], self.dir[0])
         # glRotatef(180 + self.yaw * 180 / math.pi, 0, 0, 1)

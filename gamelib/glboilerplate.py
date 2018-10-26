@@ -54,9 +54,17 @@ class Texture3D(object):
 
         self.id = glGenTextures(1)
         glBindTexture(GL_TEXTURE_3D, self.id)
-        gluBuild3DMipmaps(GL_TEXTURE_3D, GL_RGBA8, w, h, depth, GL_RGBA, GL_UNSIGNED_BYTE, data)
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+        if gluBuild3DMipmaps:
+            gluBuild3DMipmaps(GL_TEXTURE_3D, GL_RGBA8, w, h, depth, GL_RGBA, GL_UNSIGNED_BYTE, data)
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
+
+        else:
+ #           glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, w, h, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
+            glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, w, h, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+            glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+            
 
     def bind(self):
         glDisable(GL_TEXTURE_2D)
