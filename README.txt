@@ -150,3 +150,12 @@ Modifications: a lot of modifications.
 Author: Sergey Rudavin
 License: CC0 1.0 Universal https://creativecommons.org/publicdomain/zero/1.0/
 Source: https://hdrihaven.com/hdri/?c=skies&h=mud_road
+
+
+Font DIZHITL
+============
+File: models/dizhitl-regular.ttf
+Authors: Katatrad Team, changes by Cristiano Sobral, Cadson Demak
+License: SIL Open Font License, see OFL.txt
+Source: https://fontlibrary.org/en/font/dzhitl
+

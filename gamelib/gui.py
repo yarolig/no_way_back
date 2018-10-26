@@ -2,12 +2,14 @@ import logging
 import pygame
 import pygame.freetype
 import time
+from . import data
 from OpenGL import GL
 from OpenGL import GLU
 
 
 def draw_text(position, text, color=None, pxsize=64):
-    font = pygame.freetype.Font(None, pxsize)
+    #font = pygame.freetype.Font(None, pxsize)
+    font = pygame.freetype.Font(data.modelpath('dizhitl-regular.ttf'), pxsize)
     if color is None:
         color = pygame.Color('white')
 

@@ -587,10 +587,12 @@ class Game(object):
         for b in self.boats:
             if vector_len(b.pos - self.player.pos) < 1000.0:
                 b.draw(self)
-
+        
+        glEnable(GL_CULL_FACE)
         self.tertex.bind()
         self.terrain.draw()
         self.tertex.unbind()
+        glDisable(GL_CULL_FACE)
 
         self.draw_water()
         self.no_lights()
