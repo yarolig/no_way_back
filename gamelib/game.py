@@ -693,7 +693,7 @@ class Game(object):
             self.losed = True
         if self.win_timeout == 1:
             self.app.select_menu(self.app.new_menu)
-            self.win_timeout == 0
+            self.win_timeout = 0
             return
         if self.win_timeout > 0:
             self.win_timeout -= 1
