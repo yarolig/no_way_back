@@ -2,6 +2,40 @@
 from .gui import *
 
 
+def update_game_menu(app, f):
+  played_races = {}
+  available_races = {}
+  all_tracks_opened = app.config['AllOpen']
+  # Update records
+  for name, fn, b, req in f.named_buttons:
+    t = app.get_race_record(fn)
+    if t:
+      played_races[fn] = 1
+      b.text = name + " " + t
+      
+  # Fill availability
+  print(['pr:', played_races])
+  for name, fn, b, req in f.named_buttons:
+    for i in req.split():
+      if i not in played_races:
+        break
+    else:
+      available_races[fn] = 1
+  for i in available_races:
+     if not app.is_race_available(i):
+       app.set_race_available(i)
+
+  print(['ar:', available_races])
+  # Update availability
+  for name, fn, b, req in f.named_buttons:
+    if not app.is_race_available(fn):
+        if all_tracks_opened:
+          b.color = pygame.Color('black')
+        else:
+          b.disabled = True
+    else:
+        b.color = pygame.Color('white')
+      
 def prepare_menu(app):
     app.new_menu = None
     app.save_menu = None
@@ -10,6 +44,7 @@ def prepare_menu(app):
     app.options_menu = None
     app.sound_menu = Frame(app)
     app.controls_menu = Frame(app)
+    app.difficulty_menu = Frame(app)
     app.credits_menu = None
     app.loading_menu = None
 
@@ -19,60 +54,52 @@ def prepare_menu(app):
             app.start_game(d)
         return sg
 
-
     f = Frame(app)
     f.ypos += 100
     f.continue_button = f.add_button("Continue", action=app.continue_game)
     f.continue_button.disabled = True
     f.add_button("Start Race", action=lambda: app.select_menu(app.new_menu))
-    #f.add_button("Load Game", action=lambda: app.select_menu(app.save_menu))
-    #f.add_button("Save Game", action=lambda: app.select_menu(app.load_menu))
     f.add_button("Options", action=lambda: app.select_menu(app.options_menu))
-    #f.add_button("Credits", action=lambda: app.select_menu(app.credits_menu))
     f.add_button("Exit", action=app.exit)
     app.main_menu = f
 
     f = Frame(app)
     f.ypos += 20
     f.pxsize = 32
-    #f.add_button("Easy", action=ss('easy'))
-    #f.add_button("Normal", action=ss('normal'))
-    #f.add_button("Hard", action=ss('hard'))
-    #f.add_button("")
-    #f.add_button("Impossible", action=ss('impossible'))
-    #f.add_button("")
-
 
     races = [
-        ['Testing lake', 'test.png'],
-        ['Butterfly lake', 'lake.png'],
-        ['Sunny islands', 'sunny.png'],
-        ['Currents', 'currents.png'],
-        ['Long', 'long.png'],
-        # ['Trading', 'trading.png'],
-        ['Rivers', 'rivers.png'],
-        # ['Railroad', 'rail.png'],
-        ['Swamps', 'swamps.png'],
-        ['Irrigation', 'irrigation.png'],
-        ['Ice', 'ice.png'],
-        ['Exotic', 'exotic.png'],
-        ['Rescue', 'rescue.png'],
-        ['Irrigation2', 'irrigation2.png'],
-        ['Curl', 'curl.png'],
+        ['Butterfly lake', 'lake.png', ''],          # main 1
+        ['Sunny islands', 'sunny.png', 'lake.png'],  # main 2
+        ['Currents', 'currents.png', 'sunny.png'],   # main 3
+        ['Long', 'long.png', 'currents.png'], 
+        
+        # group of four
+        ['Rivers', 'rivers.png', 'long.png'],
+        ['Swamps', 'swamps.png', 'long.png'],
+        ['Irrigation', 'irrigation.png', 'long.png'],
+        ['Ice', 'ice.png', 'long.png'],
+        
+        ['Rescue', 'rescue.png', 'swamps.png rivers.png irrigation.png ice.png'],
+        ['Curl', 'curl.png', 'rescue.png'],
+        ['Exotic', 'exotic.png', 'curl.png'],                 #
+        
+        # optional
+        ['Longer', 'longer.png', 'long.png'],                 # 
+        ['Irrigation2', 'irrigation2.png', 'irrigation.png'], #
+        ['Testing lake', 'test.png', ''],
     ]
     app.set_race_available('test.png')
     app.set_race_available('lake.png')
-    for name, fn in races:
+    f.named_buttons = []
+    for name, fn, req in races:
         b = f.add_button(name, action=ss(fn))
-        if not app.is_race_available(fn):
-            # b.disabled = True
-            b.color = pygame.Color('black')
-        t = app.get_race_record(fn)
-        b.text += " " + t
+        f.named_buttons.append([name, fn, b, req])
 
+    update_game_menu(app, f)
     f.add_button("")
     f.add_button("Back", action=lambda: app.select_menu(app.main_menu))
     app.new_menu = f
+    f.update = update_game_menu
 
     app.loading_menu = None
 
@@ -86,6 +113,7 @@ def prepare_menu(app):
     # f.add_button("Graphics",action=lambda:app.select_menu(app.sound_menu))
     f.add_button("Sound", action=lambda: app.select_menu(app.sound_menu))
     f.add_button("Controls",action=lambda:app.select_menu(app.controls_menu))
+    f.add_button("Difficulty",action=lambda:app.select_menu(app.difficulty_menu))
     f.add_button("")
     f.add_button("Back", action=lambda: app.select_menu(app.main_menu))
     app.options_menu = f
@@ -158,13 +186,25 @@ def prepare_menu(app):
     app.controls_menu.add_button("Turn left: A, Left")
     app.controls_menu.add_button("Turn left: D, Right")
     app.controls_menu.add_button("")
-    app.controls_menu.add_button("Turn sail left: j")
-    app.controls_menu.add_button("Turn sail right: l")
-    app.controls_menu.add_button("Toggle sail: k")
-    app.controls_menu.add_button("Toggle anchor: Space")
+    #app.controls_menu.add_button("Turn sail left: j")
+    #app.controls_menu.add_button("Turn sail right: l")
+    #app.controls_menu.add_button("Toggle sail: k")
+    #app.controls_menu.add_button("Toggle anchor: Space")
     app.controls_menu.add_button("")
     app.controls_menu.add_button("Menu: Esc")
     app.controls_menu.add_button("Quit: F10")
     app.controls_menu.add_button("")
     app.controls_menu.add_button("Back", action=lambda: app.select_menu(app.options_menu))
+
+    app.difficulty_menu.ypos += 40
+    #app.difficulty_menu.pxsize = 32
+    cen = app.difficulty_menu.add_checkbox("Currents")
+    cen.state = app.config['NoCurrents'] == '0'
+    def currents_changed():
+        app.config['NoCurrents'] = '0' if cen.state else '1'
+        app.save_config()
+        app.load_config()
+    cen.ontoggle = currents_changed
+    app.difficulty_menu.add_button("")
+    app.difficulty_menu.add_button("Back", action=lambda: app.select_menu(app.options_menu))
 

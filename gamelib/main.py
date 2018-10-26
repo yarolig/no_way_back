@@ -171,7 +171,9 @@ class App(object):
                 if e.type == pygame.KEYUP:
                     if e.key == pygame.K_F10:
                         self.exit()
-
+                    if e.key == pygame.K_F3:
+                        self.game.on_win()
+                       
                     if self.game:
                         if e.key == pygame.K_ESCAPE:
                             self.select_menu(self.main_menu)

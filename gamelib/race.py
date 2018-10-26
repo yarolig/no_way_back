@@ -127,6 +127,7 @@ class Race(object):
         self.endpoints = []
         self.bouys = []
         self.boats = []
+        self.ships = []
         self.fzcache = None
         self.anomalies = []
 
@@ -247,6 +248,12 @@ class Race(object):
     def ocean(self, x, y):
         self.heightmap[x][y] = -100
         self.noisemap[x][y] = 50.0
+
+    @for_color(pygame.Color(255,255,255))
+    def ship(self, x, y):
+        self.heightmap[x][y] = self.heightmap[x - 1][y]
+        self.noisemap[x][y] = 0
+        self.ships.append((x, y))
 
     @for_color(pygame.Color(0, 0, 255))
     def sea(self, x, y):

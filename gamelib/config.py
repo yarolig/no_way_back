@@ -11,6 +11,8 @@ def create_config(cfgpath):
         "SoundVolume" : "1.0",
         "Resolution": "800x600",
         "Fullscreen": "0",
+        "NoCurrents": "0",
+        "AllOpen" : "1",
         "placeholder1": "0",
         "placeholder2": "0"
     }

@@ -63,6 +63,7 @@ class Boat(object):
     stationary = False
     vel_fade = 0.98
     hp = 10
+    shield_ttl = 50
     maxhp = 10
     destroy_on_impact = False
     ignore_terrain = False
@@ -95,6 +96,11 @@ class Boat(object):
 
 class Bouy(Boat):
     model = 'bouy'
+    stationary = True
+
+
+class Ship(Boat):
+    model = 'ship'
     stationary = True
 
 
@@ -175,9 +181,14 @@ class Game(object):
         self.hpbar = self.frame.add_volumebox()
         self.counter.color = pygame.Color('yellow')
 
-        self.hpbar.color = pygame.Color(140, 200, 230)
+        self.hpbar.color = pygame.Color(40, 100, 130)
 
     def update_hpbar(self):
+        
+        self.hpbar.color = pygame.Color(40, 100, 130)
+        if self.player.shield_ttl > 0:
+            self.hpbar.color = pygame.Color(150, 210, 250)
+
         self.hpbar.value = max(0, self.player.hp)
         self.hpbar.maxvalue = self.player.maxhp
 
@@ -212,14 +223,10 @@ class Game(object):
         self.models = {}
         self.time_left = 0
         self.timer_inc = 0
-
-        # self.models['boat'] = objloader.OBJ(modelpath('boat.obj'), swapyz=True)
-        # self.models['bouy'] = objloader.OBJ(filepath('checkpoint.obj'), swapyz=True)
-        # self.models['checkpoint'] = objloader.OBJ(filepath('bouy.obj'), swapyz=True)
-
-        # self.models['boat'] = pywavefront.Wavefront(modelpath('boat.obj'))
+        self.win_timeout = 0
 
         self.models['boat'] = pywavefront.Wavefront(filepath('motorboat.obj'))
+        self.models['ship'] = pywavefront.Wavefront(modelpath('boat.obj'))
         self.models['bouy'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
         self.models['checkpoint'] = pywavefront.Wavefront(filepath('buoy.obj'))
         self.models['endpoint'] = pywavefront.Wavefront(filepath('endpoint.obj'))
@@ -259,6 +266,11 @@ class Game(object):
             b.pos = make_vector(sx * x, sy * y, 0)
             self.boats.append(b)
 
+        for x, y in self.race.ships:
+            b = Ship()
+            b.pos = make_vector(sx * x, sy * y, 0)
+            self.boats.append(b)
+            
         for x, y in self.race.boats:
             b = Boat()
             b.pos = make_vector(sx * x, sy * y, 0)
@@ -648,6 +660,7 @@ class Game(object):
             pass
 
     def logic(self):
+        
         self.update_hpbar()
         if self.ticks % 50 == 0:
             self.race_logic()
@@ -656,7 +669,12 @@ class Game(object):
 
         if self.player.hp <= 0:
             self.losed = True
-
+        if self.win_timeout == 1:
+            self.app.select_menu(self.app.new_menu)
+            self.win_timeout == 0
+            return
+        if self.win_timeout > 0:
+            self.win_timeout -= 1
         if self.winned or self.losed:
             return
 
@@ -688,6 +706,7 @@ class Game(object):
             self.on_win()
             self.app.mus.effect('win')
             self.app.mus.onLevelEnd()
+            self.win_timeout = 100
             for cp in self.checkpoints:
                 cp.visited = False
         elif hit:
@@ -705,6 +724,8 @@ class Game(object):
 
         for racename in self.race.config['next_races'].split():
             self.app.set_race_available(racename)
+
+        self.app.new_menu.update(self.app, self.app.new_menu)
 
     def add_debris(self):
         self.debris = [x for x in self.debris if x.ttl > 0]
@@ -768,6 +789,9 @@ class Game(object):
         if boat.stationary or boat.destroyed:
             return
 
+        if boat.shield_ttl > 0:
+           boat.shield_ttl -= 1
+ 
         for i in range(1, 3):
             if boat.ignore_terrain:
                 continue
@@ -780,21 +804,24 @@ class Game(object):
             if newz > 0.0:
                 boat.vel = -0.9 / i * boat.vel
 
-                if not boat.quiet:
-                    self.app.mus.effect('impact')
+                if boat.shield_ttl == 0:
+                    boat.hp -= 1
+                    boat.shield_ttl = 100
+                    if not boat.quiet:
+                        self.app.mus.effect('impact')
                 if boat.destroy_on_impact:
                     boat.destroyed = True
                     boat.pos[2] -= 5.0
-                boat.hp -= 1
         else:
             boat.pos += boat.vel
 
         xx = int(boat.pos[0] / self.race.sx)
         yy = int(boat.pos[1] / self.race.sy)
         current = self.race.get_current(xx, yy)
-        if boat is self.player:
-          logging.info('current current {} at {} {}'.format(current,xx,yy))
-        boat.vel += current
+        #if boat is self.player:
+        #   logging.info('current current {} at {} {}'.format(current,xx,yy))
+        if self.app.config['NoCurrents'] == '0':
+            boat.vel += current
 
         side_dir = normalized_vector(make_vector(boat.dir[1], -boat.dir[0], boat.dir[2]))
         fwd_dir = normalized_vector(boat.dir)
@@ -817,7 +844,8 @@ class Game(object):
         boat.vel -= side_dir * side_vel * 0.05
         boat.vel -= fwd_dir * fwd_vel * 0.01
         boat.vel *= 0.9999 # boat.vel_fade
-        boat.vel -= current
+        if self.app.config['NoCurrents'] == '0':
+            boat.vel -= current
 
 
 
