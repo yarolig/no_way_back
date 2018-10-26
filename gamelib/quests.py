@@ -5,26 +5,6 @@ import math
 import logging
 import time
 
-# 0. Depart. (t0) Hilland
-# 1. Visit Great Logistics Company HQ (t1) Hilland
-# 2. Finish the course around one island (s0,s1) Hilland
-# 3. Visit 3 reliability managers. (t1,t2,t3,t4) Hilland
-# 4. Finish the route without fuel. (t2,s2,s3) Hilland
-# 5. Finish the route with dangerous currents (t3,s4,s5,s6). Sandland
-# 6. Find 3 towns with cheap fuel / Make money in limited time (t4,t5,t6,t7,t4). Riverland
-# 7. Visit 4 towns to prepare the new Regatta. (t8,t9,t10,t11)Riverland Swampland Sandland Showland
-# 8. Race around the continent. (On rails!) (t0,s7,s8,s9) Hilland
-# 9. Participate in Regatta. (t1) Hilland
-# 10. River race (t12) Riverland
-# 11. Swamp race (t13) Swampland
-# 12. Channel race (t14) Sandland
-# 13. Ice pool race (t15) Showland
-# 14. Strange flow. (Alien biology!) (t1, s99) Hilland, Showland
-# - Bring the exotic good from a far port. (t4,t16) Riverland, Rainland
-# - Rescue crew/goods from stranded! ship. (t3) Sandland
-# - Traver around the world. (Sphere!) (t2) Hilland
-
-
 intros = {
 'lake.png' : """
 Look at my new invention! It's beautifull.
@@ -123,6 +103,11 @@ They prepared a new one.
 'rivers2.png' : """
 Riverland boat racing contest was cool!
 They prepared a new one.
+""",
+
+
+'lake2.png' : """
+Thank you for playing Crossing seas!
 """,
 
 'test.png' : """

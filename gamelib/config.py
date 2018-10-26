@@ -14,7 +14,7 @@ def create_config(cfgpath):
         "NoCurrents": "0",
         "ShieldRegeneration": "1",
         "MoreTime": "1",
-        "AllOpen" : "1",
+        "AllOpen" : "0",
         "placeholder1": "0",
         "placeholder2": "0"
     }
