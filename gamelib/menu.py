@@ -224,11 +224,19 @@ def prepare_menu(app):
     #app.difficulty_menu.pxsize = 32
     cen = app.difficulty_menu.add_checkbox("Currents")
     cen.state = app.config['NoCurrents'] == '0'
-    def currents_changed():
+
+    sen = app.difficulty_menu.add_checkbox("Shield Regeneration")
+    sen.state = app.config['ShieldRegeneration'] == '1'
+    ten = app.difficulty_menu.add_checkbox("More time")
+    ten.state = app.config['MoreTime'] == '1'
+
+    def difficulty_changed():
         app.config['NoCurrents'] = '0' if cen.state else '1'
+        app.config['ShieldRegeneration'] = '1' if cen.state else '0'
+        app.config['MoreTime'] = '1' if cen.state else '0'
         app.save_config()
         app.load_config()
-    cen.ontoggle = currents_changed
+    cen.ontoggle = difficulty_changed
     app.difficulty_menu.add_button("")
     app.difficulty_menu.add_button("Back", action=lambda: app.select_menu(app.options_menu))
 

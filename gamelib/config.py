@@ -12,6 +12,8 @@ def create_config(cfgpath):
         "Resolution": "800x600",
         "Fullscreen": "0",
         "NoCurrents": "0",
+        "ShieldRegeneration": "1",
+        "MoreTime": "1",
         "AllOpen" : "1",
         "placeholder1": "0",
         "placeholder2": "0"

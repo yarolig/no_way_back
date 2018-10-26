@@ -213,6 +213,10 @@ class Game(object):
         p = Boat()
         p.pos = make_vector()
         p.dir = make_vector(0, 1, 0)
+        
+        if self.app.config['ShieldRegeneration'] == '1':
+          p.maxhp = 20
+          p.hp = 20
         self.player = p
         self.boats = []
         self.checkpoints = []
@@ -632,20 +636,29 @@ class Game(object):
         else:
             self.clock.tick_busy_loop(60)
 
+    def start_with_more_time(self):
+        if self.app.config['MoreTime'] == '1':
+            self.time_left *= 2
+    def cp_more_time(self):
+        if self.app.config['MoreTime'] == '1':
+            self.time_left *= 2
+
     def init_race_logic(self):
-        print (['Gametype', self.race_type])
         if self.race_type == 'checkpoints':
             self.time_left = int(self.race.config['start_time'])
             self.timer_inc = -1 ###
+            self.start_with_more_time()
         elif self.race_type == 'countdown':
             self.time_left = int(self.race.config['start_time'])
             self.timer_inc = -1
+            self.start_with_more_time()
         elif self.race_type == 'countup':
             self.time_left = 0
             self.timer_inc = 1
         elif self.race_type == 'circuit':
             self.time_left = int(self.race.config['start_time'])
             self.timer_inc = -1
+            self.start_with_more_time()
 
     def checkpoint_hitted(self):
         if self.race_type == 'checkpoints':
@@ -653,6 +666,9 @@ class Game(object):
                 self.timer_inc = -1
                 self.time_left = int(self.race.config['start_time'])
             self.time_left += int(self.race.config['cp_time'])
+            if self.app.config['MoreTime'] == '1':
+                # again
+                self.time_left += int(self.race.config['cp_time'])
         elif self.race_type == 'countdown':
             pass
         elif self.race_type == 'countup':
@@ -662,6 +678,9 @@ class Game(object):
                 self.timer_inc = -1
                 self.time_left = int(self.race.config['start_time'])
             self.time_left += int(self.race.config['cp_time'])
+            if self.app.config['MoreTime'] == '1':
+                # again
+                self.time_left += int(self.race.config['cp_time'])
 
     def race_logic(self):
         if self.race_type == 'checkpoints':
@@ -824,7 +843,12 @@ class Game(object):
 
         if boat.shield_ttl > 0:
            boat.shield_ttl -= 1
- 
+
+        if self.app.config['ShieldRegeneration'] == '1':
+            if boat.hp < boat.maxhp:
+              if self.ticks % 1000 == 0:
+                boat.hp += 1
+        
         for i in range(1, 3):
             if boat.ignore_terrain:
                 continue
