@@ -36,13 +36,21 @@ class App(object):
         self.active_menu = new_menu
 
     def start_game(self, race):
+        text = quests.intro_for_level(race)
+        if text:
+            make_loading_menu(self, text)
+        else:
+            make_loading_menu(self)
+            
         self.select_menu(self.loading_menu)
         pygame.event.pump()
         self.draw()
         pygame.event.pump()
         self.game = Game(self, race)
-        self.mus.onLevelStart(race)
-        self.active_menu = None
+
+        if not text:
+          self.active_menu = None
+          self.mus.onLevelStart(race)
 
     def is_race_completed(self, name):
         return self.config.get('completed_' + name, False)
@@ -73,12 +81,17 @@ class App(object):
                 or int(self.config.get('mintime_' + name, 0))
                 or "")
 
-
-
     def continue_game(self):
         if not self.game:
             return
         self.active_menu = None
+        
+    def continue_game_accent(self):
+        if not self.game:
+            return
+        self.mus.onLevelStart(race)
+        self.active_menu = None
+
 
     def load_config(self):
         self.config = load_config()

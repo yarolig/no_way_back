@@ -5,119 +5,6 @@ import math
 import logging
 import time
 
-
-class NameGen(object):
-    generated = {}
-    town_prefixes = '''
-Bay Beaver Beer Brew Bubble Boulder Brave
-Cent Crew Copper Corn Cram Cool Coal
-Dubber Donut Dough Dumb Drunk Dunk Duck
-'''.split()
-    town_suffixes = '''
-burg town yard haven hill
-bridge mouth ham ford
-mund furt
-hall tunnel crest
-'''.split()
-
-    @staticmethod
-    def gen_town_name():
-        for x in range(1000):
-            p = random.choice(NameGen.town_prefixes)
-            s = random.choice(NameGen.town_suffixes)
-            name = p + s
-            if name in NameGen.generated:
-                pp = random.choice('New Old Upper Another'.split())
-                name = pp + " " + name
-                if name in NameGen.generated:
-                    continue
-            NameGen.generated[name] = True
-            return name
-        else:
-            return "Watburg"
-
-    @staticmethod
-    def clear():
-        NameGen.generated = {}
-
-
-class Port(object):
-    def __init__(self):
-        self.name = NameGen
-
-    def visit(self, player):
-        pass
-
-
-QS_INITIAL = 0
-QS_KNOWN = 10
-QS_SUCCESS = 80
-QS_FAIL = 90
-
-
-class Quest(object):
-    def __init__(self):
-        self.name = 'Quest Name'
-        self.description = 'Description'
-        self.state = QS_INITIAL
-
-    def onPortVisit(self, port, player):
-        pass
-
-    def onSpecialSiteVisit(self, site, player):
-        pass
-
-    def onTimer(self):
-        pass
-
-
-# Regions:
-# Hilland - home
-# Sandland - dangerous, sinks, airships
-# Riverland - rich
-# Swampland - geyser
-# Showland - far
-# Rainland - exotic
-REGION_HILLAND = 1
-REGION_SANDLAND = 2
-REGION_RIVERLAND = 3
-REGION_SWAMPLAND = 4
-REGION_SNOWLAND = 5
-REGION_RAINLAND = 6
-REGIONS = '''Random Hilland Sandland Riverland Swampland Showland Rainland'''.split()
-
-
-class Quest1(object):
-    def __init__(self):
-        self.name = 'Visit HQ'
-        self.description = 'Visit Great Logistics Company HQ'
-
-    def onPortVisit(self, port, game):
-        pass
-
-    def onSpecialSiteVisit(self, site, game):
-        pass
-
-
-class Town(object):
-    pass
-    name = ""
-    region = 0
-
-    def __str__(self):
-        return "{} {}".format(REGIONS[self.region], self.name)
-
-
-def make_town(continental=None, region=0):
-    t = Town()
-    t.name = NameGen.gen_town_name()
-    if region == 0:
-        region = random.randint(1, 6)
-    t.region = region
-    # TODO: find placement in region
-    return t
-
-
 # 0. Depart. (t0) Hilland
 # 1. Visit Great Logistics Company HQ (t1) Hilland
 # 2. Finish the course around one island (s0,s1) Hilland
@@ -136,58 +23,109 @@ def make_town(continental=None, region=0):
 # - Bring the exotic good from a far port. (t4,t16) Riverland, Rainland
 # - Rescue crew/goods from stranded! ship. (t3) Sandland
 # - Traver around the world. (Sphere!) (t2) Hilland
-def prepare_quests(game):
-    game.towns = []
-    game.towns.append(make_town(region=REGION_HILLAND))  # 0
-    game.towns.append(make_town(region=REGION_HILLAND))  # 1
-    game.towns.append(make_town(region=REGION_HILLAND))  # 2
-    game.towns.append(make_town(region=REGION_SANDLAND))  # 3
-    game.towns.append(make_town(region=REGION_RIVERLAND))  # 4
-
-    game.towns.append(make_town(region=REGION_RIVERLAND))  # 5
-    game.towns.append(make_town(region=REGION_SWAMPLAND))  # 6
-    game.towns.append(make_town(region=REGION_SANDLAND))  # 7
-
-    game.towns.append(make_town(region=REGION_RIVERLAND))  # 8
-    game.towns.append(make_town(region=REGION_SWAMPLAND))  # 9
-    game.towns.append(make_town(region=REGION_SANDLAND))  # 10
-    game.towns.append(make_town(region=REGION_SNOWLAND))  # 11
-
-    game.towns.append(make_town(region=REGION_RIVERLAND))  # 12
-    game.towns.append(make_town(region=REGION_SWAMPLAND))  # 13
-    game.towns.append(make_town(region=REGION_SANDLAND))  # 14
-    game.towns.append(make_town(region=REGION_SNOWLAND))  # 15
-
-    game.towns.append(make_town(region=REGION_RAINLAND))  # 16
-
-    for i in range(32):
-        game.towns.append(make_town())
-    game.quests = []
 
 
-def port_visited(game, port):
-    for q in game.quests:
-        q.onPortVisit(port, game)
+intros = {
+'lake.png' : """
+Look at my new invention! It's beautifull.
+This new engine will allow you to move
+faster than wind! And it is simpler to control.
+It is revolutionary!
+
+Do not worry. It has enough fuel.
+And repulsion shields are charged.
+
+Touch all the floating cones and go back.
+""",
+'sunny.png' : """
+I talked with Administrator of
+Grand Logistics Company.
+They want to verify performance and
+reliability of new boat.
+
+Let's show them its speed in open sea.
+
+As you can guess the floating spheres indicate the route
+or enclose dangerous areas.
+""",
+
+'currents.png' : """
+Currents are dangerous. Especially near a coast.
+Be careful you can lose control when
+moving with same speed as the flow.
+We need to see how good out 
+new boat handle them.
+Please return in one piece.
+""",
+
+'long.png' : """
+The new technology is already being
+used for cargo delivery.
+Moreover we are preparing the contest.
+However, there is another technology that
+may be better than ours.
+They put my engine on rails!
+
+Let's show how fast the boats
+are at long distances.
+""",
+
+# group of four
+'rivers.png' : """
+Riverland boat racing contest.
+""",
+'swamps.png' : """
+Swampland boat racing contest.
+""",
+'irrigation.png' : """
+Sandland boat racing contest.
+""",
+'ice.png' : """
+Cooland boat racing contest.
+""",
+
+'rescue.png' : """
+You performing well in these currents.
+
+There is a boat stranded in dangerous area.
+We already rescued crew by aiship.
+Could you retrieve leaved cargo?
+""",
+'curl.png' : """
+You performing well in these currents.
+A strange natural disaster occurred
+in a remote region.  We need to see 
+if anyone there needs help.
+You will do it best.
+""",
+
+'exotic.png' : """
+Unbelievable!
+You rescued the crew of alien ship!
+They safe now. Alien biology is
+very similar to ours. And they have
+already shown how to improve our engines
+
+But we need exotic resources that are
+only available in one remote country
+
+Please return with it in one piece.
+""",
+
+# optional
+'longer.png' : """
+A bit longer distance.
+""",
+'irrigation2.png' : """
+Sandland boat racing contest was cool!
+They prepared a new one.
+""",
+
+'test.png' : """
+
+""",
+}
 
 
-def site_visited(game, site):
-    for q in game.quests:
-        q.onPortVisit(site, game)
-
-
-class Blank:
-    pass
-
-
-if __name__ == '__main__':
-    ng = NameGen
-    for i in range(100):
-        print(ng.gen_town_name())
-    ng.clear()
-    print('\n\n\n')
-    game = Blank()
-    prepare_quests(game)
-    i = 0
-    for t in game.towns:
-        print(i, t)
-        i += 1
+def intro_for_level(name):
+  return intros.get(name)

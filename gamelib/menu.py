@@ -1,5 +1,19 @@
 
 from .gui import *
+from . import quests
+
+
+def make_loading_menu(app, text=""):
+    f = Frame(app)
+    f.pxsize = 32
+    f.ypos += 10
+    if text:
+        for i in text.split('\n'):
+            f.add_button(i, action=app.continue_game_accent)
+        f.add_button("Continue>>", action=app.continue_game_accent)
+    else:
+      f.add_button("Loading...")
+    app.loading_menu = f
 
 
 def update_game_menu(app, f):
