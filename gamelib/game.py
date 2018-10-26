@@ -638,7 +638,7 @@ class Game(object):
 
     def start_with_more_time(self):
         if self.app.config['MoreTime'] == '1':
-            self.time_left *= 2
+            self.time_left += 20
     def cp_more_time(self):
         if self.app.config['MoreTime'] == '1':
             self.time_left *= 2

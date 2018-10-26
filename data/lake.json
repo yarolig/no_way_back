@@ -2,7 +2,7 @@
   "postnoise": "1", 
   "placeholder1": "1.0", 
   "start_time": "30", 
-  "cp_time": "15", 
+  "cp_time": "2", 
   "intro": "This is a simple race, nothing unusual", 
   "outro": "Race completed!", 
   "biome": "default", 

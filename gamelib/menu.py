@@ -110,7 +110,7 @@ def prepare_menu(app):
         ['Longer', 'longer.png', 'long.png'],                 # 
         ['Irrigation2', 'irrigation2.png', 'irrigation.png'], # 
         ['Rivers2', 'rivers2.png', 'irrigation.png'], #
-        ['Testing lake', 'test.png', ''],
+        #['Testing lake', 'test.png', ''],
     ]
     app.set_race_available('test.png')
     app.set_race_available('lake.png')
@@ -232,11 +232,13 @@ def prepare_menu(app):
 
     def difficulty_changed():
         app.config['NoCurrents'] = '0' if cen.state else '1'
-        app.config['ShieldRegeneration'] = '1' if cen.state else '0'
-        app.config['MoreTime'] = '1' if cen.state else '0'
+        app.config['ShieldRegeneration'] = '1' if sen.state else '0'
+        app.config['MoreTime'] = '1' if ten.state else '0'
         app.save_config()
         app.load_config()
     cen.ontoggle = difficulty_changed
+    sen.ontoggle = difficulty_changed
+    ten.ontoggle = difficulty_changed
     app.difficulty_menu.add_button("")
     app.difficulty_menu.add_button("Back", action=lambda: app.select_menu(app.options_menu))
 

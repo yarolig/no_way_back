@@ -1,5 +1,5 @@
-No Way Back
-===========
+Crossing seas
+=============
 
 Solo entry in PyWeek #26  <https://pyweek.org/26/> by Alexander Izmailov <yarolig@gmail.com>
 
@@ -11,6 +11,8 @@ You might need to install some of these before running the game:
   Python 2.7 or 3.6:     https://www.python.org/
   PyGame:                https://www.pygame.org/
   PyOpenGL:              http://pyopengl.sourceforge.net/
+  pyglet                 https://pyglet.org/
+  PyWavefront            https://pypi.org/project/PyWavefront/
   numpy
 
 You can run this command to install the required libraries:
@@ -25,20 +27,25 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 
   python run_game.py
 
-Please make sure that you not running the game on notebook with battery saving turned on.
+Please make sure that you not running the game with battery saver turned on.
 The game runs slowly with nouveau drivers. Please use it with proprietary NVIDIA drivers.
 
 
 HOW TO PLAY THE GAME:
 
-There is no game yet.
+WSAD or Arrows controls the boat.
+Remember that you can change some difficulty settings.
 
+
+BUGS:
+Game crashes after resizing windows.
+Please resize the window on the first screen.
 
 LICENSE:
 
-No Way Back is free software.
+Crossing seas is free software.
 Code in gamelib/ folder and artwork in data/ folder are distributed in terms of MIT License.
-Music in music/ and models in models/ uses a different licenses.
+Sounds and music in music/ folder and various graphics in models/ folder comes with another licenses.
 
 
 MUSIC:
@@ -106,24 +113,6 @@ Modifications: Converted to OGG format.
 Author: TreasureSounds
 License: CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
 Source: https://freesound.org/people/TreasureSounds/sounds/332629/
-
-
-Impact sound (unused)
-=====================
-File: music/352114__inspectorj__dropping-wood-h.wav
-Modifications: none
-Author: Jonathan Shaw
-License: CC BY 3.0 https://creativecommons.org/licenses/by/3.0/
-Source: https://freesound.org/people/InspectorJ/sounds/352114/
-
-
-Template for adding more songs
-==============================
-File:
-Modifications: Converted to OGG format.
-Author:
-License:
-Source:
 
 
 MODELS AND OTHER GRAPHICS:
