@@ -96,23 +96,23 @@ def prepare_menu(app):
         ['Butterfly lake', 'lake.png', ''],  # main 1
         ['Sunny islands', 'sunny.png', 'lake.png'],  # main 2
         ['Currents', 'currents.png', 'sunny.png'],  # main 3
-        ['Long', 'long.png', 'currents.png'],
+        ['Long river', 'long.png', 'currents.png'],
 
         # group of four
-        ['Rivers', 'rivers.png', 'long.png'],
-        ['Swamps', 'swamps.png', 'long.png'],
+        ['Riverland conters', 'rivers.png', 'long.png'],
+        ['Swampland contest', 'swamps.png', 'long.png'],
         ['Irrigation', 'irrigation.png', 'long.png'],
-        ['Ice', 'ice.png', 'long.png'],
+        ['Cooland contest', 'ice.png', 'long.png'],
 
         ['Rescue', 'rescue.png', 'swamps.png rivers.png irrigation.png ice.png'],
         ['Curl', 'curl.png', 'rescue.png'],
         ['Exotic', 'exotic.png', 'curl.png'],  #
 
         # optional
-        ['Longer', 'longer.png', 'long.png'],  #
-        ['Irrigation2', 'irrigation2.png', 'irrigation.png'],  #
-        ['Rivers2', 'rivers2.png', 'irrigation.png'],  #
         ['The End', 'lake2.png', 'exotic.png'],  #
+        ['Longer river', 'longer.png', 'long.png'],  #
+        ['Second Sandland contest', 'irrigation2.png', 'irrigation.png longer.png'],  #
+        ['Second Riverland contest', 'rivers2.png', 'rivers.png longer.png'],  #
         # ['Testing lake', 'test.png', ''],
     ]
     app.set_race_available('test.png')
