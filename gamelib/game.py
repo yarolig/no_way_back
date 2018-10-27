@@ -49,13 +49,44 @@ def dot_product(va, vb):
 
 def bind_texture_hack(texture):
     if not getattr(texture, 'image', None):
-        texture.image = glboilerplate.Texture(texture.path)
+        texture.image = gettexture2d(texture.path)
         texture.image.target = GL_TEXTURE_2D
         texture.image.id = texture.image.id
     texture.image.bind()
 
 
 pywavefront.visualization.bind_texture = bind_texture_hack
+
+
+all_3d_textures = {}
+def gettexture3d(filenames):
+    joined = '@@@'.join(filenames)
+    cached = all_3d_textures.get(joined)
+    if cached:
+        return cached
+    t = glboilerplate.Texture3D(filenames)
+    all_3d_textures[joined] = t
+    return t
+
+all_2d_textures = {}
+def gettexture2d(filename):
+    cached = all_2d_textures.get(filename)
+    if cached:
+        return cached
+    t = glboilerplate.Texture(filename)
+    all_2d_textures[filename] = t
+    return t
+
+
+all_models = {}
+def getmodel(filename):
+    cached = all_models.get(filename)
+    if cached:
+        return cached
+    t = pywavefront.Wavefront(filename)
+    all_models[filename] = t
+    return t
+
 
 
 class Boat(object):
@@ -226,11 +257,11 @@ class Game(object):
         self.timer_inc = 0
         self.win_timeout = 0
 
-        self.models['boat'] = pywavefront.Wavefront(filepath('motorboat.obj'))
-        self.models['ship'] = pywavefront.Wavefront(modelpath('boat.obj'))
-        self.models['bouy'] = pywavefront.Wavefront(filepath('checkpoint.obj'))
-        self.models['checkpoint'] = pywavefront.Wavefront(filepath('buoy.obj'))
-        self.models['endpoint'] = pywavefront.Wavefront(filepath('endpoint.obj'))
+        self.models['boat'] = getmodel(filepath('motorboat.obj'))
+        self.models['ship'] = getmodel(modelpath('boat.obj'))
+        self.models['bouy'] = getmodel(filepath('checkpoint.obj'))
+        self.models['checkpoint'] = getmodel(filepath('buoy.obj'))
+        self.models['endpoint'] = getmodel(filepath('endpoint.obj'))
 
         self.clock = pygame.time.Clock()
         self.ticks = 0
@@ -249,7 +280,7 @@ class Game(object):
         self.skybox.prepare()
 
     def prepare_race(self, racename):
-        self.tertex = glboilerplate.Texture3D([
+        self.tertex = gettexture3d([
             filepath('dirt.png'),
             filepath('dirt.png'),
             filepath('sand.png'),
@@ -431,7 +462,7 @@ class Game(object):
         self.deepsvb.prepare()
 
     def prepare_water(self):
-        self.water_tex = glboilerplate.Texture(filepath('water.png'))
+        self.water_tex = gettexture2d(filepath('water.png'))
         water_scale = 5.0
         water_overhang = 15
         sx = self.race.sx * water_scale

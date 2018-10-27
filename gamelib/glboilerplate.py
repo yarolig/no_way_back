@@ -34,6 +34,8 @@ class Texture(object):
         glDisable(GL_TEXTURE_2D)
 
 
+
+
 class Texture3D(object):
     def __init__(self, filenames):
         surfaces = []

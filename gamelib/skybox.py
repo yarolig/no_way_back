@@ -57,7 +57,8 @@ class Skybox(object):
             uv_size=2, uv_offset=4 * 3, mode=GL_QUADS)
         self.vb.prepare()
         texpath = data.modelpath('mud_road_2k.jpg')
-        self.texture = glboilerplate.Texture(texpath)
+        from . import game
+        self.texture = game.gettexture2d(texpath)
 
     def draw(self):
         glDisable(GL_DEPTH_TEST)
