@@ -133,8 +133,7 @@ class App(object):
 
         logging.debug("freetype")
         pygame.freetype.init()
-        self.font = pygame.freetype.Font(None)
-
+        
         logging.debug("mixer init")
         pygame.mixer.init(frequency=44100, buffer=1024 * 2)
         logging.debug("mixer init: {}".format(pygame.mixer.get_init()))
@@ -191,9 +190,6 @@ class App(object):
                 if e.type == pygame.KEYUP:
                     if e.key == pygame.K_F10:
                         self.exit()
-                    if e.key == pygame.K_F3:
-                        self.game.on_win()
-
                     if self.game:
                         if e.key == pygame.K_ESCAPE:
                             self.select_menu(self.main_menu)

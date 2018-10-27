@@ -7,9 +7,13 @@ from OpenGL import GL
 from OpenGL import GLU
 
 
+fonts = {}
 def draw_text(position, text, color=None, pxsize=64):
     # font = pygame.freetype.Font(None, pxsize)
-    font = pygame.freetype.Font(data.modelpath('dizhitl-regular.ttf'), pxsize)
+    
+    if not fonts.get(pxsize):
+        fonts[pxsize] = pygame.freetype.Font(data.modelpath('dizhitl-regular.ttf'), pxsize)
+    font = fonts[pxsize]
     if color is None:
         color = pygame.Color('white')
 
