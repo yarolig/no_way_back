@@ -7,14 +7,14 @@ def create_config(cfgpath):
     cfg = {
         "Music": "1",
         "MusicVolume": "1.0",
-        "Sound" : "1",
-        "SoundVolume" : "1.0",
+        "Sound": "1",
+        "SoundVolume": "1.0",
         "Resolution": "800x600",
         "Fullscreen": "0",
         "NoCurrents": "0",
         "ShieldRegeneration": "1",
         "MoreTime": "1",
-        "AllOpen" : "0",
+        "AllOpen": "0",
         "placeholder1": "0",
         "placeholder2": "0"
     }

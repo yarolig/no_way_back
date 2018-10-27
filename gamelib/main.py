@@ -35,7 +35,6 @@ class App(object):
         print("select menu {}".format(new_menu))
         self.active_menu = new_menu
 
-
     def start_custom_race(self, race, rt, laps=0):
         make_loading_menu(self)
         self.select_menu(self.loading_menu)
@@ -52,7 +51,7 @@ class App(object):
             make_loading_menu(self, text)
         else:
             make_loading_menu(self)
-            
+
         self.select_menu(self.loading_menu)
         pygame.event.pump()
         self.draw()
@@ -60,8 +59,8 @@ class App(object):
         self.game = Game(self, race)
 
         if not text:
-          self.active_menu = None
-          self.mus.onLevelStart(race)
+            self.active_menu = None
+            self.mus.onLevelStart(race)
 
     def is_race_completed(self, name):
         return self.config.get('completed_' + name, False)
@@ -89,27 +88,25 @@ class App(object):
 
     def get_race_record(self, name):
         return str(int(self.config.get('maxtime_' + name, 0))
-                or int(self.config.get('mintime_' + name, 0))
-                or "")
+                   or int(self.config.get('mintime_' + name, 0))
+                   or "")
 
     def continue_game(self):
         if not self.game:
             return
         self.active_menu = None
-        
+
     def continue_game_accent(self):
         if not self.game:
             return
         self.mus.onLevelStart(race)
         self.active_menu = None
 
-
     def load_config(self):
         self.config = load_config()
 
     def save_config(self):
         save_config(self.config)
-
 
     def init(self):
         self.active_menu = None
@@ -119,7 +116,7 @@ class App(object):
 
         self.w, self.h = list(map(int,
                                   self.config['Resolution'].split('x')))
-        #logging.basicConfig(level=logging.DEBUG)
+        # logging.basicConfig(level=logging.DEBUG)
 
         logging.debug("mixer pre-init")
         pygame.mixer.pre_init()
@@ -197,7 +194,7 @@ class App(object):
                         self.exit()
                     if e.key == pygame.K_F3:
                         self.game.on_win()
-                       
+
                     if self.game:
                         if e.key == pygame.K_ESCAPE:
                             self.select_menu(self.main_menu)

@@ -12,6 +12,7 @@ from OpenGL.GLU import *
 
 __all__ = ['Skybox']
 
+
 def make_vector5(x=0, y=0, z=0, u=0, v=0):
     v = np.ndarray(shape=(3,), dtype=float)
     v[0] = x
@@ -19,9 +20,11 @@ def make_vector5(x=0, y=0, z=0, u=0, v=0):
     v[2] = z
     return v
 
+
 class Skybox(object):
     def __init__(self):
         self.floats = []
+
     def prepare(self):
         cos = math.cos
         sin = math.sin
@@ -31,31 +34,31 @@ class Skybox(object):
 
         def alpha(q):
             return q * math.pi * 2.0 / arange
+
         def beta(q):
             return q * math.pi * 2.0 / arange
 
-        def vertex(a,b):
+        def vertex(a, b):
             x = r * cos(alpha(a)) * cos(beta(b))
             y = r * sin(alpha(a)) * cos(beta(b))
             z = r * sin(beta(b))
             u = -float(a) / arange
-            v = beta(float(math.fabs(float(b)/bhalfrange)))
-            self.floats += [x,y,z,u,v*5]
+            v = beta(float(math.fabs(float(b) / bhalfrange)))
+            self.floats += [x, y, z, u, v * 5]
 
         for a in range(arange):
-            for b in range(-1, bhalfrange+1):
-
-                vertex(a+1,b)
-                vertex(a,b)
-                vertex(a,b+1)
-                vertex(a+1,b+1)
+            for b in range(-1, bhalfrange + 1):
+                vertex(a + 1, b)
+                vertex(a, b)
+                vertex(a, b + 1)
+                vertex(a + 1, b + 1)
         self.vb = glboilerplate.VertexBuffer(
             self.floats,
             vertex_size=3, vertex_offset=0,
-            uv_size=2, uv_offset=4*3, mode=GL_QUADS)
+            uv_size=2, uv_offset=4 * 3, mode=GL_QUADS)
         self.vb.prepare()
         texpath = data.modelpath('mud_road_2k.jpg')
-        #texpath = data.modelpath('sky.jpg')
+        # texpath = data.modelpath('sky.jpg')
         self.texture = glboilerplate.Texture(texpath)
 
     def draw(self):

@@ -8,7 +8,7 @@ from OpenGL import GLU
 
 
 def draw_text(position, text, color=None, pxsize=64):
-    #font = pygame.freetype.Font(None, pxsize)
+    # font = pygame.freetype.Font(None, pxsize)
     font = pygame.freetype.Font(data.modelpath('dizhitl-regular.ttf'), pxsize)
     if color is None:
         color = pygame.Color('white')
@@ -61,12 +61,13 @@ class Button(object):
             color = pygame.Color('yellow')
 
         draw_text((self.x, app.get_screen_size()[1] - self.y, 0),
-                   self.text, color,
-                   pxsize=self.pxsize)
+                  self.text, color,
+                  pxsize=self.pxsize)
 
 
 class Checkbox(Button):
     state = False
+
     def draw(self, app):
         t = self.text
         if self.state:
@@ -87,10 +88,11 @@ class Checkbox(Button):
 class VolumeBox(Button):
     value = 5
     maxvalue = 10
+
     def draw(self, app):
         self.text = ('[' +
                      '|' * self.value +
-                     '.' * (self.maxvalue-self.value)
+                     '.' * (self.maxvalue - self.value)
                      + ']')
         Button.draw(self, app)
 
@@ -105,6 +107,7 @@ class VolumeBox(Button):
 
     def onchange(self):
         pass
+
 
 class Frame(object):
     def __init__(self, app):
@@ -127,8 +130,8 @@ class Frame(object):
 
     def add_button(self, text, action=None, disabled=False):
         self.ypos += int(self.pxsize * 1.1)
-        w,h=self.app.get_screen_size()
-        b = Button(text, 60, self.ypos, w/2, self.pxsize, self.pxsize)
+        w, h = self.app.get_screen_size()
+        b = Button(text, 60, self.ypos, w / 2, self.pxsize, self.pxsize)
         b.disabled = disabled
         if action:
             b.onclick = action
@@ -137,8 +140,8 @@ class Frame(object):
 
     def add_checkbox(self, text, action=None, state=False):
         self.ypos += int(self.pxsize * 1.1)
-        w,h=self.app.get_screen_size()
-        b = Checkbox(text, 60, self.ypos, w/2, self.pxsize, self.pxsize)
+        w, h = self.app.get_screen_size()
+        b = Checkbox(text, 60, self.ypos, w / 2, self.pxsize, self.pxsize)
         b.state = state
         if action:
             b.ontoggle = action
@@ -147,8 +150,8 @@ class Frame(object):
 
     def add_volumebox(self, text="", action=None, value=5, maxvalue=10):
         self.ypos += int(self.pxsize * 1.1)
-        w,h=self.app.get_screen_size()
-        b = VolumeBox(text, 60, self.ypos, w/2, self.pxsize, self.pxsize)
+        w, h = self.app.get_screen_size()
+        b = VolumeBox(text, 60, self.ypos, w / 2, self.pxsize, self.pxsize)
         b.value = value
         b.maxvalue = maxvalue
         if action:

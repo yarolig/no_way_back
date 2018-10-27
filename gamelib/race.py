@@ -50,7 +50,6 @@ CELL_SIDE = 10.0
 VERTEX_COMPONENTS = (3 + 3 + 3)  # (vertices+normal+uvw)
 VERTEX_SIZE = 4 * VERTEX_COMPONENTS  # sizeof(float)
 
-
 A_SINK = 1
 A_SOURCE = 2
 A_CURL = 3
@@ -249,7 +248,7 @@ class Race(object):
         self.heightmap[x][y] = -100
         self.noisemap[x][y] = 50.0
 
-    @for_color(pygame.Color(255,255,255))
+    @for_color(pygame.Color(255, 255, 255))
     def ship(self, x, y):
         self.heightmap[x][y] = self.heightmap[x - 1][y]
         self.noisemap[x][y] = 0
@@ -300,8 +299,8 @@ class Race(object):
         for y in range(h):
             for x in range(w):
                 if (math.fabs(self.heightmap[x][y]) <= 1.0
-                    or x == 0 or y == 0
-                    or x == w - 1 or y == h - 1):
+                        or x == 0 or y == 0
+                        or x == w - 1 or y == h - 1):
                     new_heightmap[x][y] = self.heightmap[x][y]
                 else:
                     new_heightmap[x][y] = self.getz_noised(x, y)
@@ -343,15 +342,15 @@ class Race(object):
 
     def get_current(self, x, y):
         summ = np.ndarray(shape=(2,), dtype=float)
-        summ[0]=0
-        summ[1]=0
+        summ[0] = 0
+        summ[1] = 0
         for (x, y) in self.enum_currents(x, y):
             summ += (x, y)
         result = np.ndarray(shape=(3,), dtype=float)
         result[0] = summ[0]
         result[1] = summ[1]
         result[2] = 0
-        #print(["get_current",x,y,result])
+        # print(["get_current",x,y,result])
         return result
 
     def save_default_race_conf(self, name):
@@ -370,7 +369,7 @@ class Race(object):
             "start_time": "30",
             "cp_time": "15",
             "laps": "1",
-            "type" : 'countup',  #"type" : 'checkpoints'
+            "type": 'countup',  # "type" : 'checkpoints'
 
             "placeholder1": "1.0",
             "placeholder2": "1.0"

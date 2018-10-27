@@ -202,10 +202,10 @@ class Game(object):
                 self.counter.text = "{}".format(self.time_left)
                 if self.laps > 1:
                     self.counter.text += (" {}/{}".format(self.current_lap, self.laps))
-                  
+
             else:
                 self.counter.text = "--"
-            
+
     def __init__(self, app, racename='race1.png', race_type=None, laps=0):
         self.app = app
         self.racename = racename
@@ -213,10 +213,10 @@ class Game(object):
         p = Boat()
         p.pos = make_vector()
         p.dir = make_vector(0, 1, 0)
-        
+
         if self.app.config['ShieldRegeneration'] == '1':
-          p.maxhp = 20
-          p.hp = 20
+            p.maxhp = 20
+            p.hp = 20
         self.player = p
         self.boats = []
         self.checkpoints = []
@@ -245,9 +245,9 @@ class Game(object):
 
         self.prepare_race(racename)
         if race_type:
-          self.race_type = race_type
+            self.race_type = race_type
         if not self.laps:
-          self.laps = int(self.race.config.get('laps', 1))
+            self.laps = int(self.race.config.get('laps', 1))
         self.init_race_logic()
         self.prepare_water()
         self.prepare_deeps()
@@ -282,7 +282,7 @@ class Game(object):
             b = Ship()
             b.pos = make_vector(sx * x, sy * y, 0)
             self.boats.append(b)
-            
+
         for x, y in self.race.boats:
             b = Boat()
             b.pos = make_vector(sx * x, sy * y, 0)
@@ -456,21 +456,22 @@ class Game(object):
             floats.append(z)
 
         for i in range(-water_overhang, int(self.race.w / water_scale) + water_overhang):
-            for j in range(-water_overhang, int(self.race.h / water_scale) + water_overhang):
-                vert((i) * sx,  (j) * sy, 0.0)
-                tex( (i) * stx, (j) * sty)
+            for j in range(-water_overhang,
+                           int(self.race.h / water_scale) + water_overhang):
+                vert((i) * sx, (j) * sy, 0.0)
+                tex((i) * stx, (j) * sty)
 
-                vert((i + 1) * sx,  (j) * sy, 0.0)
-                tex( (i + 1) * stx, (j) * sty)
+                vert((i + 1) * sx, (j) * sy, 0.0)
+                tex((i + 1) * stx, (j) * sty)
 
-                vert((i + 1) * sx,  (j + 1) * sy, 0.0)
-                tex( (i + 1) * stx, (j + 1) * sty)
+                vert((i + 1) * sx, (j + 1) * sy, 0.0)
+                tex((i + 1) * stx, (j + 1) * sty)
 
-                vert((i) * sx,  (j + 1) * sy, 0.0)
-                tex( (i) * stx, (j + 1) * sty)
+                vert((i) * sx, (j + 1) * sy, 0.0)
+                tex((i) * stx, (j + 1) * sty)
         self.watervb = glboilerplate.VertexBuffer(
             floats,
-            uv_offset=3*4, uv_size=2,
+            uv_offset=3 * 4, uv_size=2,
             vertex_offset=0,
             mode=GL_QUADS
         )
@@ -573,7 +574,7 @@ class Game(object):
         glPopMatrix()
 
         glEnable(GL_BLEND)
-        #glDisable(GL_BLEND)
+        # glDisable(GL_BLEND)
         glColor4f(1.0, 1.0, 1.0, 0.5)
         glNormal3f(0.0, 0.0, 1.0)
         self.water_tex.bind()
@@ -611,7 +612,7 @@ class Game(object):
         for b in self.boats:
             if vector_len(b.pos - self.player.pos) < 1000.0:
                 b.draw(self)
-        
+
         glEnable(GL_CULL_FACE)
         self.tertex.bind()
         self.terrain.draw()
@@ -626,7 +627,8 @@ class Game(object):
 
         self.ticks += 1
         if self.ticks % 100 == 0:
-            pygame.display.set_caption("pyweek26: No Way Back FPS:{}".format(self.clock.get_fps()))
+            pygame.display.set_caption(
+                "pyweek26: No Way Back FPS:{}".format(self.clock.get_fps()))
 
         self.setup_2d_camera()
         self.frame.draw()
@@ -639,6 +641,7 @@ class Game(object):
     def start_with_more_time(self):
         if self.app.config['MoreTime'] == '1':
             self.time_left += 20
+
     def cp_more_time(self):
         if self.app.config['MoreTime'] == '1':
             self.time_left *= 2
@@ -646,7 +649,7 @@ class Game(object):
     def init_race_logic(self):
         if self.race_type == 'checkpoints':
             self.time_left = int(self.race.config['start_time'])
-            self.timer_inc = -1 ###
+            self.timer_inc = -1  ###
             self.start_with_more_time()
         elif self.race_type == 'countdown':
             self.time_left = int(self.race.config['start_time'])
@@ -842,13 +845,13 @@ class Game(object):
             return
 
         if boat.shield_ttl > 0:
-           boat.shield_ttl -= 1
+            boat.shield_ttl -= 1
 
         if self.app.config['ShieldRegeneration'] == '1':
             if boat.hp < boat.maxhp:
-              if self.ticks % 1000 == 0:
-                boat.hp += 1
-        
+                if self.ticks % 1000 == 0:
+                    boat.hp += 1
+
         for i in range(1, 3):
             if boat.ignore_terrain:
                 continue
@@ -875,12 +878,13 @@ class Game(object):
         xx = int(boat.pos[0] / self.race.sx)
         yy = int(boat.pos[1] / self.race.sy)
         current = self.race.get_current(xx, yy)
-        #if boat is self.player:
+        # if boat is self.player:
         #   logging.info('current current {} at {} {}'.format(current,xx,yy))
         if self.app.config['NoCurrents'] == '0':
             boat.vel += current
 
-        side_dir = normalized_vector(make_vector(boat.dir[1], -boat.dir[0], boat.dir[2]))
+        side_dir = normalized_vector(
+            make_vector(boat.dir[1], -boat.dir[0], boat.dir[2]))
         fwd_dir = normalized_vector(boat.dir)
         fwd_dp = dot_product(fwd_dir, normalized_vector(boat.vel))
         side_dp = dot_product(side_dir, normalized_vector(boat.vel))
@@ -890,8 +894,8 @@ class Game(object):
         yaw_force = boat.rudder * (fwd_vel * 0.1 + 0.03)
         boat.dyaw += yaw_force
 
-        #print ('yf:{}'.format(yaw_force))
-        #if self.ticks% 30 == 0:
+        # print ('yf:{}'.format(yaw_force))
+        # if self.ticks% 30 == 0:
         #    print({'sd': side_dir, 'fd': fwd_dir})
         #    print({'fp': fwd_dp, 'sp': side_dp})
         #    print({'fv': fwd_vel, 'sv': side_vel})
@@ -900,11 +904,9 @@ class Game(object):
         # boat.vel *= boat.vel_fade
         boat.vel -= side_dir * side_vel * 0.05
         boat.vel -= fwd_dir * fwd_vel * 0.01
-        boat.vel *= 0.9999 # boat.vel_fade
+        boat.vel *= 0.9999  # boat.vel_fade
         if self.app.config['NoCurrents'] == '0':
             boat.vel -= current
-
-
 
         boat.yaw += boat.dyaw
         boat.pitch += boat.dpitch

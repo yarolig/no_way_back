@@ -1,10 +1,10 @@
-
 import random
 import pygame
 import pygame.event
 import logging
 import time
 from . import data
+
 
 class Track(object):
     file = ''
@@ -74,9 +74,12 @@ class Mus(object):
             self.music.set_volume(float(self.app.config['MusicVolume']))
             self.music.play(loops=0)
 
-        self.sounds['impact'] = pygame.mixer.Sound(data.musicpath('274943__theshaggyfreak__knock-knock1.ogg'))
-        self.sounds['checkpoint'] = pygame.mixer.Sound(data.musicpath('332629__treasuresounds__item-pickup.ogg'))
-        self.sounds['win'] = pygame.mixer.Sound(data.musicpath('147256__pjcohen__skiba22edge.ogg'))
+        self.sounds['impact'] = pygame.mixer.Sound(
+            data.musicpath('274943__theshaggyfreak__knock-knock1.ogg'))
+        self.sounds['checkpoint'] = pygame.mixer.Sound(
+            data.musicpath('332629__treasuresounds__item-pickup.ogg'))
+        self.sounds['win'] = pygame.mixer.Sound(
+            data.musicpath('147256__pjcohen__skiba22edge.ogg'))
 
     def onLevelStart(self, level):
         if self.music is None:
@@ -110,10 +113,10 @@ class Mus(object):
 
     def onExit(self):
         if self.music:
-             self.music.fadeout(500)
-             self.music = None
+            self.music.fadeout(500)
+            self.music = None
 
-    def effect(self,name):
+    def effect(self, name):
         if self.app.config['Sound'] == '1':
             self.sounds[name].set_volume(float(self.app.config['SoundVolume']))
             self.sounds[name].play()
