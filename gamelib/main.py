@@ -54,12 +54,15 @@ class App(object):
         self.select_menu(self.loading_menu)
         pygame.event.pump()
         self.draw()
+
         pygame.event.pump()
         self.game = Game(self, race)
-
         if not text:
             self.active_menu = None
             self.mus.onLevelStart(race)
+        else:
+            self.loading_menu.loading_button.text = "Start!"
+
 
     def is_race_completed(self, name):
         return self.config.get('completed_' + name, False)
@@ -96,17 +99,9 @@ class App(object):
         if not t:
             return ""
         fseconds = float(t)
-        print (['fseconds=', fseconds])
         sf =  math.floor(math.fmod(fseconds, 1.0)*100.0)
         seconds = math.floor(math.fmod(fseconds, 60.0))
         minutes = math.floor(fseconds / 60.0)
-
-
-        print (['sf=', sf])
-
-        print (['seconds=', seconds])
-
-        print (['minutes=', minutes])
 
         s = "{:02.0f}:{:02.0f}.{:02.0f}".format(minutes, seconds, sf)
         return s
@@ -223,9 +218,18 @@ class App(object):
                     if self.active_menu:
                         x, y = e.pos
                         self.active_menu.mouseMove(x, self.h - y)
+                    if self.game:
+                        self.game.mouse_motion[0] = e.rel[0]
+                        self.game.mouse_motion[1] = e.rel[1]
+
+                elif e.type == pygame.MOUSEBUTTONDOWN:
+                    if self.game:
+                        self.controls.onKey('mouse', True, self.game.actions)
                 elif e.type == pygame.MOUSEBUTTONUP:
                     if self.active_menu:
                         self.active_menu.click()
+                    if self.game:
+                        self.controls.onKey('mouse', False, self.game.actions)
                 elif e.type == pygame.VIDEORESIZE:
                     self.onResize(e.w, e.h)
                 elif e.type == pygame.USEREVENT:

@@ -1,5 +1,6 @@
 from .gui import *
 from . import quests
+import random
 
 
 def make_loading_menu(app, text=""):
@@ -9,7 +10,19 @@ def make_loading_menu(app, text=""):
     if text:
         for i in text.split('\n'):
             f.add_button(i, action=app.continue_game_accent)
-        f.add_button("Continue>>", action=app.continue_game_accent)
+
+        loading_text = random.choice([
+            'Wait a sec',
+            'Please wait...',
+            'Loooooading..',
+            'Hold on a sec',
+            'Charging shields...',
+            'Loading fuel..',
+            'Wait a minute...',
+            'TODO: place a spinner here',
+            'Loading...',
+        ])
+        f.loading_button = f.add_button(loading_text, action=app.continue_game_accent)
     else:
         f.add_button("Loading...")
     app.loading_menu = f
@@ -217,6 +230,8 @@ def prepare_menu(app):
     app.controls_menu.add_button("Move back: S, Down")
     app.controls_menu.add_button("Turn left: A, Left")
     app.controls_menu.add_button("Turn left: D, Right")
+    app.controls_menu.add_button("")
+    app.controls_menu.add_button("Hold mouse button to look around")
     app.controls_menu.add_button("")
     app.controls_menu.add_button("Menu: Esc")
     app.controls_menu.add_button("Quit: F10")

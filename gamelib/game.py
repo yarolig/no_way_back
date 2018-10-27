@@ -203,6 +203,9 @@ class Game(object):
         self.app = app
         self.racename = racename
         self.init_gui()
+        self.mouse_motion = [0.0, 0.0]
+        self.cam_yaw = 0.0
+        self.cam_pitch = 0.0
         p = Boat()
         p.pos = make_vector()
         p.dir = make_vector(0, 1, 0)
@@ -505,9 +508,23 @@ class Game(object):
         self.player.dir = make_vector(math.cos(self.player.yaw),
                                       math.sin(self.player.yaw),
                                       0)
+        if self.actions['mouse']:
+            self.cam_yaw += self.mouse_motion[0] * 0.01
+            self.mouse_motion[0] = 0
+        else:
+            self.cam_yaw *= 0.8
+
+        cdir = make_vector(math.cos(self.player.yaw + self.cam_yaw),
+                           math.sin(self.player.yaw + self.cam_yaw),
+                           0)
         glMatrixMode(GL_MODELVIEW)
-        eye = self.player.pos - self.player.dir * 30.0 + self.up * 20.0
-        tgt = self.player.pos + self.player.dir * 30.0 + self.up * 10.0
+
+        eye = self.player.pos - cdir * 30.0 + self.up * 20.0
+        tgt = self.player.pos + cdir * 30.0 + self.up * 10.0
+        if self.actions['b']:
+            tgt = self.player.pos - self.player.dir * 30.0 + self.up * 10.0
+            eye = self.player.pos + self.player.dir * 30.0 + self.up * 20.0
+
         glLoadIdentity()
         gluLookAt(eye[0], eye[1], eye[2],
                   tgt[0], tgt[1], tgt[2],
@@ -891,13 +908,3 @@ class Game(object):
         boat.dyaw *= 0.2
         boat.dpitch *= 0.2
         boat.droll *= 0.2
-
-    def onKey(self, key):
-        if key == pygame.K_a:
-            self.player.yaw += 0.1
-        elif key == pygame.K_d:
-            self.player.yaw -= 0.1
-        elif key == pygame.K_w:
-            self.player.pos += self.player.dir * 100
-        elif key == pygame.K_s:
-            self.player.pos -= self.player.dir * 100
