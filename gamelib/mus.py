@@ -9,6 +9,7 @@ from . import data
 class Track(object):
     file = ''
     ls_time = 0.0
+    volume_multiplier = 1.0
 
 
 class Mus(object):
@@ -17,22 +18,27 @@ class Mus(object):
         self.music = None
         self.tracks = []
         self.sounds = {}
+        self.sound_volume_multiplier = {}
 
         t = Track()
         t.file = 'Podington_Bear_-_11_-_Massive_Attack.ogg'
         t.ls_time = 59.55
+        t.volume_multiplier = 0.2
         self.tracks.append(t)
 
         t = Track()
         t.file = 'Cutside_-_01_-_Secret_Of_3rd_Planet.ogg'
+        t.volume_multiplier = 0.3
         self.tracks.append(t)
 
         t = Track()
         t.file = 'fascinating_earthbound_objects_-_03_-_pangs.ogg'
+        t.volume_multiplier = 0.4
         self.tracks.append(t)
 
         t = Track()
         t.file = 'how_the_night_came_-_06_-_6_Pris.ogg'
+        t.volume_multiplier = 1.0
         t.ls_time = 99.2
         self.tracks.append(t)
 
@@ -52,7 +58,7 @@ class Mus(object):
 
     def onMusicVolumeChanged(self):
         if self.music:
-            self.music.set_volume(float(self.app.config['MusicVolume']))
+            self.music.set_volume(self.current_track.volume_multiplier * float(self.app.config['MusicVolume']))
 
     def onMusicToggle(self):
         if self.app.config['Music'] == '1':
@@ -71,15 +77,20 @@ class Mus(object):
             logging.debug("music file: {}".format(music_file))
             self.music = pygame.mixer.music
             self.music.load(music_file)
-            self.music.set_volume(float(self.app.config['MusicVolume']))
+            self.music.set_volume(self.current_track.volume_multiplier * float(self.app.config['MusicVolume']))
             self.music.play(loops=0)
 
         self.sounds['impact'] = pygame.mixer.Sound(
             data.musicpath('274943__theshaggyfreak__knock-knock1.ogg'))
+        self.sound_volume_multiplier['impact'] = 1.0
+
         self.sounds['checkpoint'] = pygame.mixer.Sound(
             data.musicpath('332629__treasuresounds__item-pickup.ogg'))
+        self.sound_volume_multiplier['checkpoint'] = 1.0
+
         self.sounds['win'] = pygame.mixer.Sound(
             data.musicpath('147256__pjcohen__skiba22edge.ogg'))
+        self.sound_volume_multiplier['win'] = 0.4
 
     def onLevelStart(self, level):
         if self.music is None:
@@ -105,7 +116,7 @@ class Mus(object):
                 break
         music_file = data.musicpath(self.current_track.file)
         self.music.load(music_file)
-        self.music.set_volume(float(self.app.config['MusicVolume']))
+        self.music.set_volume(self.current_track.volume_multiplier * float(self.app.config['MusicVolume']))
         self.music.play(loops=0)
 
     def onLevelEnd(self):
@@ -118,5 +129,6 @@ class Mus(object):
 
     def effect(self, name):
         if self.app.config['Sound'] == '1':
-            self.sounds[name].set_volume(float(self.app.config['SoundVolume']))
+            vm = self.sound_volume_multiplier[name]
+            self.sounds[name].set_volume(vm * float(self.app.config['SoundVolume']))
             self.sounds[name].play()
