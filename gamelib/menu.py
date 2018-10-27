@@ -18,7 +18,7 @@ def make_loading_menu(app, text=""):
 def update_game_menu(app, f):
     played_races = {}
     available_races = {}
-    all_tracks_opened = app.config['AllOpen']
+    all_tracks_opened = '1' == app.config['AllOpen']
     # Update records
     for name, fn, b, req in f.named_buttons:
         t = app.get_race_record(fn)
@@ -50,7 +50,7 @@ def update_game_menu(app, f):
                 b.disabled = True
         else:
             b.color = pygame.Color('white')
-
+            b.disabled = False
 
 def prepare_menu(app):
     app.new_menu = None
