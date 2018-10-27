@@ -29,7 +29,6 @@ def update_game_menu(app, f):
             b.text = name + " " + "(completed)"
 
     # Fill availability
-    print(['pr:', played_races])
     for name, fn, b, req in f.named_buttons:
         for i in req.split():
             if i not in played_races:
@@ -40,7 +39,6 @@ def update_game_menu(app, f):
         if not app.is_race_available(i):
             app.set_race_available(i)
 
-    print(['ar:', available_races])
     # Update availability
     for name, fn, b, req in f.named_buttons:
         if not app.is_race_available(fn):
@@ -84,8 +82,8 @@ def prepare_menu(app):
     f.continue_button = f.add_button("Continue", action=app.continue_game)
     f.continue_button.disabled = True
     f.add_button("Start Race", action=lambda: app.select_menu(app.new_menu))
-    f.add_button("Custom Races",
-                 action=lambda: app.select_menu(app.custom_races_menu))
+    # f.add_button("Custom Races",
+    #             action=lambda: app.select_menu(app.custom_races_menu))
     f.add_button("Options", action=lambda: app.select_menu(app.options_menu))
     f.add_button("Exit", action=app.exit)
     app.main_menu = f
@@ -138,7 +136,6 @@ def prepare_menu(app):
 
     f = Frame(app)
     f.ypos += 100
-    # f.add_button("Graphics",action=lambda:app.select_menu(app.sound_menu))
     f.add_button("Sound", action=lambda: app.select_menu(app.sound_menu))
     f.add_button("Controls", action=lambda: app.select_menu(app.controls_menu))
     f.add_button("Difficulty", action=lambda: app.select_menu(app.difficulty_menu))
@@ -221,11 +218,6 @@ def prepare_menu(app):
     app.controls_menu.add_button("Turn left: A, Left")
     app.controls_menu.add_button("Turn left: D, Right")
     app.controls_menu.add_button("")
-    # app.controls_menu.add_button("Turn sail left: j")
-    # app.controls_menu.add_button("Turn sail right: l")
-    # app.controls_menu.add_button("Toggle sail: k")
-    # app.controls_menu.add_button("Toggle anchor: Space")
-    app.controls_menu.add_button("")
     app.controls_menu.add_button("Menu: Esc")
     app.controls_menu.add_button("Quit: F10")
     app.controls_menu.add_button("")
@@ -233,7 +225,6 @@ def prepare_menu(app):
                                  action=lambda: app.select_menu(app.options_menu))
 
     app.difficulty_menu.ypos += 40
-    # app.difficulty_menu.pxsize = 32
     cen = app.difficulty_menu.add_checkbox("Currents")
     cen.state = app.config['NoCurrents'] == '0'
     app.difficulty_menu.add_button("")
@@ -265,7 +256,8 @@ def prepare_menu(app):
 
     f = Frame(app)
     f.ypos += 100
-    # f.add_button("Graphics",action=lambda:app.select_menu(app.sound_menu))
     f.add_button("Lake circuit", action=sc('lake.png', 'circuit', laps=3))
+    f.add_button("Currents circuit", action=sc('currents.png', 'circuit', laps=3))
+    f.add_button("Long circuit", action=sc('longer.png', 'circuit', laps=2))
     f.add_button("Back", action=lambda: app.select_menu(app.main_menu))
     app.custom_races_menu = f

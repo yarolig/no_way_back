@@ -8,7 +8,6 @@ import pygame
 import time
 
 from OpenGL.GL import *
-from OpenGL.GLU import *
 
 __all__ = ['Skybox']
 
@@ -58,7 +57,6 @@ class Skybox(object):
             uv_size=2, uv_offset=4 * 3, mode=GL_QUADS)
         self.vb.prepare()
         texpath = data.modelpath('mud_road_2k.jpg')
-        # texpath = data.modelpath('sky.jpg')
         self.texture = glboilerplate.Texture(texpath)
 
     def draw(self):

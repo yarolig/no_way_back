@@ -1,9 +1,4 @@
 from __future__ import print_function
-import numpy as np
-import random
-import math
-import logging
-import time
 
 intros = {
     'lake.png': """

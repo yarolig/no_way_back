@@ -132,13 +132,6 @@ class Debris(Boat):
         v = make_vector()
         v += self.pos
         self.path.append(v)
-        # else:
-        #    print('prev:{} curr:{}'.format(self.prevpos, self.pos))
-
-        # upos = self.pos + (0,0,10)
-        # glColor3f(1,1,1,1)
-        # glVertex3f(self.pos[0], self.pos[1], self.pos[2])
-        # glVertex3f(upos[0], upos[1], upos[2])
 
         if self.ttl < 100:
             glColor4f(0.01 * self.ttl,
@@ -405,7 +398,6 @@ class Game(object):
             floats.append(y)
             r2 = (x * x + y * y)
             q = min(1000.0, (max(0, (maxr) ** 2 - r2)) ** 0.5)
-            # print('{} {} {} dd={} r2={}'.format(x,y,q,(maxr), r2**0.5))
             floats.append(-q - 0.5)
 
         ib = -deeps_overhang
@@ -894,14 +886,6 @@ class Game(object):
         yaw_force = boat.rudder * (fwd_vel * 0.1 + 0.03)
         boat.dyaw += yaw_force
 
-        # print ('yf:{}'.format(yaw_force))
-        # if self.ticks% 30 == 0:
-        #    print({'sd': side_dir, 'fd': fwd_dir})
-        #    print({'fp': fwd_dp, 'sp': side_dp})
-        #    print({'fv': fwd_vel, 'sv': side_vel})
-        #    print({'yf': yaw_force})
-
-        # boat.vel *= boat.vel_fade
         boat.vel -= side_dir * side_vel * 0.05
         boat.vel -= fwd_dir * fwd_vel * 0.01
         boat.vel *= 0.9999  # boat.vel_fade

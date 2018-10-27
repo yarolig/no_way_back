@@ -34,39 +34,6 @@ class Texture(object):
         glDisable(GL_TEXTURE_2D)
 
 
-def dirty_hack(filenames,w,h,depth):
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
-    '''glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, 128, 128, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    glTexImage3D(GL_TEXTURE_3D, 1, GL_RGBA8, 64, 64, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    glTexImage3D(GL_TEXTURE_3D, 2, GL_RGBA8, 32, 32, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    glTexImage3D(GL_TEXTURE_3D, 3, GL_RGBA8, 16, 16, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    glTexImage3D(GL_TEXTURE_3D, 4, GL_RGBA8, 8, 8, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    glTexImage3D(GL_TEXTURE_3D, 5, GL_RGBA8, 4, 4, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-    '''
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAX_LEVEL, 4)
-    glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_TRUE)
-
-    for level, side in [
-        (0,128),
-        (1, 64),
-        (2, 32),
-        (3, 16),
-        (4, 8),
-        #(5, 4),
-        #(6, 2),
-        #(7, 1),
-    ]:
-        z = 0
-        for f in filenames:
-            fn = f.replace('.png', '.d/{}.png'.format(side))
-            surface = pygame.image.load(fn)
-            d = pygame.image.tostring(surface, 'RGBA', True)
-            glTexSubImage3D(GL_TEXTURE_3D, level,
-                            0, 0, z, #xoffset yoffset zoffset,
-                            side, side, 1,
-                            GL_RGBA, GL_UNSIGNED_BYTE, d)
-            z+=1
 class Texture3D(object):
     def __init__(self, filenames):
         surfaces = []
@@ -94,14 +61,13 @@ class Texture3D(object):
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
 
         else:
-            #           glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA8, w, h, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, None)
-            #glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_TRUE)
+            # I hope some ot this will work
+            glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_TRUE)
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR)
             glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
             glTexImage3D(GL_TEXTURE_3D, 0, GL_RGB8, w, h, depth, 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
-            #dirty_hack(filenames,w,h,depth)
+            glTexParameteri(GL_TEXTURE_3D, GL_GENERATE_MIPMAP, GL_FALSE)
             glGenerateMipmap(GL_TEXTURE_3D)
-            # glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
 
     def bind(self):
         glDisable(GL_TEXTURE_2D)
@@ -142,7 +108,6 @@ class VertexBuffer(object):
     def prepare(self):
         self.id = glGenBuffers(1)
         glBindBuffer(GL_ARRAY_BUFFER, self.id)
-        # print("{}".format(self.data[0:20]))
         glBufferData(GL_ARRAY_BUFFER, len(self.data) * 4, self.data, GL_STATIC_DRAW)
         size = glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE)
         glBindBuffer(GL_ARRAY_BUFFER, 0)

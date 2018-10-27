@@ -1,5 +1,5 @@
 {
-  "cp_time": "15",
+  "cp_time": "1",
   "outro": "Race completed!",
   "scale_x": "20.0",
   "scale_y": "20.0",
@@ -7,7 +7,7 @@
   "placeholder2": "1.0",
   "type": "countup",
   "prenoise": "1",
-  "start_time": "30",
+  "start_time": "350",
   "postnoise": "1",
   "biome": "default",
   "placeholder1": "1.0",

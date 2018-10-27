@@ -28,12 +28,7 @@ def hc(color):
 def for_color(color):
     def decorator(func):
         color_actions[hc(color)] = func
-        print('{} {}'.format(hc(color), repr(func)))
-
     return decorator
-
-
-#
 
 
 def pargs(func):
@@ -56,7 +51,6 @@ A_CURL = 3
 A_FOUNTAIN = 4
 A_GEYSER = 5
 A_BUBBLE_SINK = 5
-A_GEYSER = 5
 
 
 class Anomaly(object):
@@ -350,7 +344,6 @@ class Race(object):
         result[0] = summ[0]
         result[1] = summ[1]
         result[2] = 0
-        # print(["get_current",x,y,result])
         return result
 
     def save_default_race_conf(self, name):

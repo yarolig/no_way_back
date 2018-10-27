@@ -32,7 +32,6 @@ class App(object):
         return (self.w, self.h)
 
     def select_menu(self, new_menu):
-        print("select menu {}".format(new_menu))
         self.active_menu = new_menu
 
     def start_custom_race(self, race, rt, laps=0):
