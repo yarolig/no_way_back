@@ -698,9 +698,9 @@ class Game(object):
 
     def logic(self):
         self.update_hpbar()
+        self.update_counter()
         if self.ticks % 50 == 0:
             self.race_logic()
-            self.update_counter()
             self.time_left += self.timer_inc
 
         if self.player.hp <= 0:
@@ -759,15 +759,7 @@ class Game(object):
 
     def on_win(self):
         self.winned = True
-        if self.race_type == 'checkpoints':
-            self.app.set_race_maxtime(self.racename, self.time_left)
-        elif self.race_type == 'countdown' and self.time_left > 0:
-            self.app.set_race_maxtime(self.racename, self.time_left)
-        elif self.race_type == 'countup':
-            self.app.set_race_mintime(self.racename, self.time_left)
-        elif self.race_type == 'circuit':
-            self.app.set_race_maxtime(self.racename, self.time_left)
-
+        self.app.set_race_record(self.racename, self.ticks / 50.0)
         self.app.set_race_completed(self.racename)
         for racename in self.race.config['next_races'].split():
             self.app.set_race_available(racename)

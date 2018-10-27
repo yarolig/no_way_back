@@ -23,7 +23,7 @@ class Mus(object):
         t = Track()
         t.file = 'Podington_Bear_-_11_-_Massive_Attack.ogg'
         t.ls_time = 59.55
-        t.volume_multiplier = 0.2
+        t.volume_multiplier = 0.1
         self.tracks.append(t)
 
         t = Track()

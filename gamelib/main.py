@@ -85,10 +85,31 @@ class App(object):
         self.config['maxtime_' + name] = str(min(oldt, t))
         self.save_config()
 
+    def set_race_record(self, name, t):
+        oldt = float(self.config.get('record_' + name, 99999999))
+        if oldt > t:
+            self.config['record_' + name] = str(t)
+            self.save_config()
+
     def get_race_record(self, name):
-        return str(int(self.config.get('maxtime_' + name, 0))
-                   or int(self.config.get('mintime_' + name, 0))
-                   or "")
+        t = self.config.get('record_' + name, 0)
+        if not t:
+            return ""
+        fseconds = float(t)
+        print (['fseconds=', fseconds])
+        sf =  math.floor(math.fmod(fseconds, 1.0)*100.0)
+        seconds = math.floor(math.fmod(fseconds, 60.0))
+        minutes = math.floor(fseconds / 60.0)
+
+
+        print (['sf=', sf])
+
+        print (['seconds=', seconds])
+
+        print (['minutes=', minutes])
+
+        s = "{:02.0f}:{:02.0f}.{:02.0f}".format(minutes, seconds, sf)
+        return s
 
     def continue_game(self):
         if not self.game:

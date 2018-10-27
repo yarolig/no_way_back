@@ -25,8 +25,8 @@ def update_game_menu(app, f):
         c = app.is_race_completed(fn)
         if t or c:
             played_races[fn] = 1
-            # b.text = name + " " + (t or "(completed)")
-            b.text = name + " " + "(completed)"
+            b.text = name + " " + (t or "(completed)")
+            # b.text = name + " " + "(completed)"
 
     # Fill availability
     for name, fn, b, req in f.named_buttons:
