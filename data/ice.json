@@ -6,7 +6,7 @@
   "start_time": "60",
   "scale_z": "2.0",
   "type": "checkpoints",
-  "cp_time": "60",
+  "cp_time": "30",
   "postnoise": "1",
   "prenoise": "1",
   "placeholder2": "1.0",

@@ -173,7 +173,6 @@ class Game(object):
         self.frame.ypos = 32
         self.hpbar = self.frame.add_volumebox()
         self.counter.color = pygame.Color('yellow')
-
         self.hpbar.color = pygame.Color(40, 100, 130)
 
     def update_hpbar(self):
@@ -195,7 +194,6 @@ class Game(object):
                 self.counter.text = "{}".format(self.time_left)
                 if self.laps > 1:
                     self.counter.text += (" {}/{}".format(self.current_lap, self.laps))
-
             else:
                 self.counter.text = "--"
 
@@ -285,6 +283,7 @@ class Game(object):
             b.destroy_on_impact = True
             self.boats.append(b)
 
+        #print(['checkpoint count = ', len(self.race.checkpoints)])
         for x, y in self.race.checkpoints:
             b = Checkpoint()
             b.pos = make_vector(sx * x, sy * y, 1)
