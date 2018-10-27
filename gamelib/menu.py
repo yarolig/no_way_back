@@ -244,7 +244,7 @@ def prepare_menu(app):
     ten.state = app.config['MoreTime'] == '1'
 
     app.difficulty_menu.add_button("")
-    aen = app.difficulty_menu.add_checkbox("Open All Races")
+    aen = app.difficulty_menu.add_checkbox("All races opened")
     aen.state = app.config['AllOpen'] == '1'
 
     def difficulty_changed():

@@ -642,9 +642,9 @@ class Game(object):
         if self.app.config['MoreTime'] == '1':
             self.time_left += 20
 
-    def cp_more_time(self):
+    def cp_more_time(self, cp_time):
         if self.app.config['MoreTime'] == '1':
-            self.time_left *= 2
+            self.time_left += min(cp_time, 10)
 
     def init_race_logic(self):
         if self.race_type == 'checkpoints':
@@ -671,7 +671,7 @@ class Game(object):
             self.time_left += int(self.race.config['cp_time'])
             if self.app.config['MoreTime'] == '1':
                 # again
-                self.time_left += int(self.race.config['cp_time'])
+                self.cp_more_time(int(self.race.config['cp_time']))
         elif self.race_type == 'countdown':
             pass
         elif self.race_type == 'countup':
@@ -683,7 +683,7 @@ class Game(object):
             self.time_left += int(self.race.config['cp_time'])
             if self.app.config['MoreTime'] == '1':
                 # again
-                self.time_left += int(self.race.config['cp_time'])
+                self.cp_more_time(int(self.race.config['cp_time']))
 
     def race_logic(self):
         if self.race_type == 'checkpoints':
