@@ -33,7 +33,6 @@ def for_color(color):
 
 def pargs(func):
     def wrapper(*args, **kwargs):
-        print("pargs {} {}".format(args, kwargs))
         return func(*args, **kwargs)
 
     return wrapper

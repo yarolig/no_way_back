@@ -105,7 +105,6 @@ class VolumeBox(Button):
         self.onchange()
 
     def dec(self):
-        print([0, self.value - 1])
         self.value = max(0, self.value - 1)
         self.onchange()
 
